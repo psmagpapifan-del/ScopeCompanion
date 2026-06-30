@@ -45,7 +45,6 @@ import {
 } from "./utils/localization";
 
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 import {
   getLocalizedCategories,
@@ -345,49 +344,232 @@ export default function App() {
   };
 
   const exportBriefAsPDF = async () => {
-    if (!briefRef.current) return;
+    if (!generatedBriefData) return;
     setIsExportingPdf(true);
     playBeep(440, "sine", 0.1);
     try {
-      const element = briefRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-      });
-      
-      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "pt",
         format: "a4"
       });
-      
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      const margin = 20;
+
+      const margin = 40;
       const contentWidth = pdfWidth - (margin * 2);
-      const contentHeight = canvas.height * (contentWidth / canvas.width);
-      
-      if (contentHeight <= (pdfHeight - margin * 2)) {
-        pdf.addImage(imgData, "PNG", margin, margin, contentWidth, contentHeight, undefined, "FAST");
-      } else {
-        let heightLeft = contentHeight;
-        let position = margin;
-        
-        pdf.addImage(imgData, "PNG", margin, position, contentWidth, contentHeight, undefined, "FAST");
-        heightLeft -= (pdfHeight - margin * 2);
-        
-        while (heightLeft > 0) {
+      let y = 40;
+
+      // Helper function to check vertical space and insert page break
+      const checkPageBreak = (neededHeight: number) => {
+        if (y + neededHeight > pdfHeight - 60) {
           pdf.addPage();
-          position = margin - (contentHeight - heightLeft);
-          pdf.addImage(imgData, "PNG", margin, position, contentWidth, contentHeight, undefined, "FAST");
-          heightLeft -= (pdfHeight - margin * 2);
+          y = 40;
+          // Draw a small running header on new page
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(8);
+          pdf.setTextColor(120, 120, 120);
+          pdf.text("Project Scoping Brief (Continued)", margin, y);
+          pdf.setDrawColor(200, 200, 200);
+          pdf.setLineWidth(0.5);
+          pdf.line(margin, y + 5, margin + contentWidth, y + 5);
+          y += 25;
         }
-      }
+      };
+
+      // Header Banner: Coral background
+      pdf.setFillColor(255, 107, 107); // #FF6B6B
+      pdf.setDrawColor(45, 52, 54); // #2D3436
+      pdf.setLineWidth(2);
+      pdf.roundedRect(margin, y, contentWidth, 60, 8, 8, "FD");
+
+      // Header Text
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(16);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("PROJECT SCOPING BRIEF", margin + 20, y + 28);
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(9);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("CLIENT-READY OVERVIEW  |  SMART BUDDY AI", margin + 20, y + 45);
+
+      y += 85;
+
+      // Section 1: CORE OBJECTIVE
+      checkPageBreak(120);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(120, 120, 120);
+      pdf.text("01. CORE OBJECTIVE", margin, y);
+      y += 12;
+
+      // Content Box for Core Objective
+      const coreGoalText = generatedBriefData.coreGoal || "";
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      pdf.setTextColor(26, 26, 26);
+      const wrappedCoreGoal = pdf.splitTextToSize(coreGoalText, contentWidth - 30);
+      const coreGoalBoxHeight = wrappedCoreGoal.length * 15 + 20;
+
+      pdf.setFillColor(255, 249, 242); // #FFF9F2 (light warm cream)
+      pdf.setDrawColor(220, 220, 220);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(margin, y, contentWidth, coreGoalBoxHeight, 8, 8, "FD");
+
+      pdf.text(wrappedCoreGoal, margin + 15, y + 18);
+      y += coreGoalBoxHeight + 25;
+
+      // Section 2: TARGET AUDIENCE & TIMELINE BUDGET (Grid layout in 2 columns)
+      checkPageBreak(120);
+      const colWidth = (contentWidth - 15) / 2;
+
+      // Measure wrapped texts first to determine the box height
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9.5);
+      const wrappedAudience = pdf.splitTextToSize(generatedBriefData.audience || "", colWidth - 20);
+      const wrappedTimeline = pdf.splitTextToSize(generatedBriefData.timelineBudget || "", colWidth - 20);
+
+      const maxLines = Math.max(wrappedAudience.length, wrappedTimeline.length);
+      const gridBoxHeight = maxLines * 14 + 35;
+
+      // Col 1: Target Audience
+      pdf.setFillColor(243, 244, 246); // #F3F4F6
+      pdf.setDrawColor(220, 220, 220);
+      pdf.roundedRect(margin, y, colWidth, gridBoxHeight, 8, 8, "FD");
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("TARGET AUDIENCE", margin + 10, y + 16);
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(26, 26, 26);
+      pdf.text(wrappedAudience, margin + 10, y + 30);
+
+      // Col 2: Timeline & Budget
+      pdf.setFillColor(243, 244, 246); // #F3F4F6
+      pdf.roundedRect(margin + colWidth + 15, y, colWidth, gridBoxHeight, 8, 8, "FD");
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("TIMELINE & BUDGET", margin + colWidth + 25, y + 16);
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(26, 26, 26);
+      pdf.text(wrappedTimeline, margin + colWidth + 25, y + 30);
+
+      y += gridBoxHeight + 25;
+
+      // Section 3: MVP SCOPE
+      checkPageBreak(100);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(120, 120, 120);
+      pdf.text("02. MVP SCOPE", margin, y);
+      y += 12;
+
+      const mvpLines = (generatedBriefData.mvpScope || "").split("\n").filter((l: string) => l.trim().length > 0);
       
+      // Calculate height of MVP section
+      let mvpTotalHeight = 20;
+      const wrappedMvpLines: string[][] = [];
+      mvpLines.forEach((line: string) => {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9.5);
+        const wrapped = pdf.splitTextToSize(line, contentWidth - 40);
+        wrappedMvpLines.push(wrapped);
+        mvpTotalHeight += wrapped.length * 15 + 6;
+      });
+
+      checkPageBreak(mvpTotalHeight);
+
+      // Draw Yellow Highlight Container
+      pdf.setFillColor(255, 230, 109); // #FFE66D background color
+      pdf.setDrawColor(45, 52, 54); // charcoal border
+      pdf.setLineWidth(1.5);
+      pdf.roundedRect(margin, y, contentWidth, mvpTotalHeight, 8, 8, "FD");
+
+      let mvpY = y + 18;
+      wrappedMvpLines.forEach((wrappedLine: string[]) => {
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(255, 107, 107); // coral bullet
+        pdf.text("•", margin + 15, mvpY);
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(26, 26, 26);
+        pdf.text(wrappedLine, margin + 30, mvpY);
+        mvpY += wrappedLine.length * 15 + 6;
+      });
+
+      y += mvpTotalHeight + 25;
+
+      // Section 4: SUGGESTED TECH STACK (LAYMAN ANALOGIES)
+      checkPageBreak(120);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(120, 120, 120);
+      pdf.text("03. TECH STACK ANALOGIES", margin, y);
+      y += 12;
+
+      const techs = generatedBriefData.suggestedTech || [];
+      for (let i = 0; i < techs.length; i++) {
+        const tech = techs[i];
+        
+        // Measure height
+        pdf.setFont("helvetica", "oblique");
+        pdf.setFontSize(9);
+        const wrappedAnalogy = pdf.splitTextToSize(`"${tech.analogy}"`, contentWidth - 30);
+        const techBoxHeight = wrappedAnalogy.length * 14 + 32;
+
+        checkPageBreak(techBoxHeight + 15);
+
+        // Tech item container
+        pdf.setFillColor(255, 249, 242); // #FFF9F2
+        pdf.setDrawColor(45, 52, 54); // #2D3436
+        pdf.setLineWidth(1);
+        pdf.roundedRect(margin, y, contentWidth, techBoxHeight, 8, 8, "FD");
+
+        // Term Title (e.g. React Native / Flutter)
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(10);
+        pdf.setTextColor(255, 107, 107); // #FF6B6B
+        pdf.text(tech.term.toUpperCase(), margin + 15, y + 16);
+
+        // Layman Badge text
+        const termWidth = pdf.getTextWidth(tech.term.toUpperCase());
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(8);
+        pdf.setTextColor(78, 205, 196); // #4ECDC4
+        pdf.text(`(${tech.laymanName.toUpperCase()})`, margin + 15 + termWidth + 8, y + 16);
+
+        // Analogy description
+        pdf.setFont("helvetica", "oblique");
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(wrappedAnalogy, margin + 15, y + 28);
+
+        y += techBoxHeight + 10;
+      }
+
+      // Add a footer page number on each page
+      const totalPages = (pdf as any).internal.getNumberOfPages();
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        pdf.setPage(pageNum);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(8);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(
+          `Smart Buddy AI Scoping Agent  |  Page ${pageNum} of ${totalPages}`,
+          margin,
+          pdfHeight - 25
+        );
+      }
+
       pdf.save(`Project_Scoping_Brief_${Date.now()}.pdf`);
       playBeep(587.33, "sine", 0.2);
     } catch (error) {

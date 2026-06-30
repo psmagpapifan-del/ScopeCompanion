@@ -108,22 +108,22 @@ Provide the response in the specified JSON format with an engaging everyday anal
 
     let response;
     try {
-      console.log("Attempting to generate content using primary model: gemini-3.5-flash");
+      console.log("Attempting to generate content using primary model: gemini-2.5-flash");
       response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: generateConfig
       });
     } catch (primaryError: any) {
-      console.warn("Primary model (gemini-3.5-flash) failed. Falling back to gemini-3.1-flash-lite. Error details:", primaryError);
+      console.warn("Primary model (gemini-2.5-flash) failed. Falling back to gemini-1.5-flash. Error details:", primaryError);
       try {
         response = await ai.models.generateContent({
-          model: "gemini-3.1-flash-lite",
+          model: "gemini-1.5-flash",
           contents: prompt,
           config: generateConfig
         });
       } catch (fallbackError: any) {
-        console.error("Fallback model (gemini-3.1-flash-lite) also failed. Error details:", fallbackError);
+        console.error("Fallback model (gemini-1.5-flash) also failed. Error details:", fallbackError);
         throw new Error(`AI service is currently unavailable. Primary error: ${primaryError.message || primaryError}. Fallback error: ${fallbackError.message || fallbackError}`);
       }
     }
