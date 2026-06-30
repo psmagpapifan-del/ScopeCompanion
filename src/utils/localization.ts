@@ -43,6 +43,7 @@ export interface Translations {
   questBriefCopy: string;
   questBriefCopied: string;
   questBriefShareEmail: string;
+  questBriefExportPdf: string;
   questBriefReadyTitle: string;
   questBriefReadyDesc: string;
 
@@ -145,6 +146,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "Copy Brief to Clipboard",
     questBriefCopied: "Copy Brief Copied!",
     questBriefShareEmail: "Share via Email",
+    questBriefExportPdf: "Export as PDF",
     questBriefReadyTitle: "Scoping Brief Ready to Build",
     questBriefReadyDesc: "Complete the 5 questions on the left or select an interactive preset template to instantly render a client-friendly project overview.",
 
@@ -241,6 +243,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "Copiar Resumen al Portapapeles",
     questBriefCopied: "¡Resumen Copiado!",
     questBriefShareEmail: "Compartir por Correo",
+    questBriefExportPdf: "Exportar como PDF",
     questBriefReadyTitle: "Resumen de Alcance Listo para Crear",
     questBriefReadyDesc: "Complete las 5 preguntas a la izquierda o seleccione una plantilla interactiva para generar instantáneamente una vista general del proyecto amigable para el cliente.",
 
@@ -337,6 +340,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "复制简报到剪贴板",
     questBriefCopied: "简报复制成功！",
     questBriefShareEmail: "通过邮件分享",
+    questBriefExportPdf: "导出为 PDF",
     questBriefReadyTitle: "简报生成器已就绪",
     questBriefReadyDesc: "在左侧填写 5 个核心问题，或选择一个交互式预设模板，即可立刻为客户呈现清晰友好的项目规划视图。",
 
@@ -433,6 +437,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "Copier le Brief dans le Presse-papiers",
     questBriefCopied: "Brief Copié !",
     questBriefShareEmail: "Partager par E-mail",
+    questBriefExportPdf: "Exporter en PDF",
     questBriefReadyTitle: "Brief de Cadrage Prêt à Créer",
     questBriefReadyDesc: "Remplissez les 5 questions à gauche ou sélectionnez un modèle interactif pour générer instantanément une vue d'ensemble du projet adaptée au client.",
 
@@ -529,6 +534,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "要件書をクリップボードにコピー",
     questBriefCopied: "要件書をコピーしました！",
     questBriefShareEmail: "メールで共有",
+    questBriefExportPdf: "PDFとしてエクスポート",
     questBriefReadyTitle: "要件書生成の準備完了",
     questBriefReadyDesc: "左側の5つの質問に入力するか、インタラクティブなプリセット例を選択すると、クライアント向けの分かりやすい構成案が即座に生成されます。",
 
@@ -625,6 +631,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "Copiar Resumo para a Área de Transferência",
     questBriefCopied: "Resumo Copiado!",
     questBriefShareEmail: "Compartilhar por E-mail",
+    questBriefExportPdf: "Exportar como PDF",
     questBriefReadyTitle: "Resumo de Escopo Pronto para Construir",
     questBriefReadyDesc: "Preencha as 5 perguntas à esquerda ou selecione um modelo interativo para gerar instantaneamente uma visão geral amigável do projeto.",
 
@@ -721,6 +728,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "نسخ الموجز إلى الحافظة",
     questBriefCopied: "تم نسخ الموجز بنجاح!",
     questBriefShareEmail: "مشاركة عبر البريد الإلكتروني",
+    questBriefExportPdf: "تصدير كملف PDF",
     questBriefReadyTitle: "الموجز جاهز للتوليد الآن",
     questBriefReadyDesc: "أكمل الإجابة عن الأسئلة الخمسة على اليسار أو اختر قالباً تفاعلياً جاهزاً لتقديم نظرة عامة واضحة ومبسطة للمشروع فوراً.",
 
@@ -817,6 +825,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "Sao Chép Tóm Tắt Vào Clipboard",
     questBriefCopied: "Đã Sao Chép Bản Tóm Tắt!",
     questBriefShareEmail: "Chia sẻ qua Email",
+    questBriefExportPdf: "Xuất ra PDF",
     questBriefReadyTitle: "Bản Tóm Tắt Sẵn Sàng Được Khởi Tạo",
     questBriefReadyDesc: "Hoàn tất 5 câu hỏi ở bên trái hoặc chọn một mẫu thử nghiệm nhanh để hiển thị ngay tóm tắt dự án trực quan, thân thiện cho khách hàng.",
 
@@ -913,6 +922,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "Kopyahin ang Brief sa Clipboard",
     questBriefCopied: "Kopya na ang Brief!",
     questBriefShareEmail: "Ibahagi sa Email",
+    questBriefExportPdf: "I-export bilang PDF",
     questBriefReadyTitle: "Brief sa Pag-iskop Handa nang Buuin",
     questBriefReadyDesc: "Kumpletuhin ang 5 tanong sa kaliwa o pumili ng interactive na preset upang makagawa agad ng malinaw na buod ng proyekto para sa kliyente.",
 
@@ -1009,6 +1019,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "ब्रीफ को क्लिपबोर्ड पर कॉपी करें",
     questBriefCopied: "ब्रीफ सफलतापूर्वक कॉपी हो गया!",
     questBriefShareEmail: "ईमेल के माध्यम से साझा करें",
+    questBriefExportPdf: "PDF के रूप में निर्यात करें",
     questBriefReadyTitle: "ब्रीफ जनरेशन के लिए तैयार",
     questBriefReadyDesc: "प्रोजेक्ट का एक सरल अवलोकन तुरंत देखने के लिए बाईं ओर के 5 प्रश्नों को पूरा करें या कोई एक प्रीसेट उदाहरण चुनें।",
 
@@ -1105,6 +1116,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     questBriefCopy: "요구사항 브리프 복사",
     questBriefCopied: "요구사항 브리프가 복사되었습니다!",
     questBriefShareEmail: "이메일로 공유",
+    questBriefExportPdf: "PDF로 내보내기",
     questBriefReadyTitle: "브리프 생성 준비 완료",
     questBriefReadyDesc: "왼쪽의 5가지 질문에 입력하거나 프리셋 예제를 선택하면, 고객 맞춤형 브리프 요약안이 즉시 생성됩니다.",
 

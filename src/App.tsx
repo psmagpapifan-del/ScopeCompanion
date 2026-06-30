@@ -44,6 +44,9 @@ import {
   Translations
 } from "./utils/localization";
 
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
 import {
   getLocalizedCategories,
   getLocalizedPresets,
@@ -341,6 +344,59 @@ export default function App() {
     setTimeout(() => setCopiedText(null), 2000);
   };
 
+  const exportBriefAsPDF = async () => {
+    if (!briefRef.current) return;
+    setIsExportingPdf(true);
+    playBeep(440, "sine", 0.1);
+    try {
+      const element = briefRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+      });
+      
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4"
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const margin = 20;
+      const contentWidth = pdfWidth - (margin * 2);
+      const contentHeight = canvas.height * (contentWidth / canvas.width);
+      
+      if (contentHeight <= (pdfHeight - margin * 2)) {
+        pdf.addImage(imgData, "PNG", margin, margin, contentWidth, contentHeight, undefined, "FAST");
+      } else {
+        let heightLeft = contentHeight;
+        let position = margin;
+        
+        pdf.addImage(imgData, "PNG", margin, position, contentWidth, contentHeight, undefined, "FAST");
+        heightLeft -= (pdfHeight - margin * 2);
+        
+        while (heightLeft > 0) {
+          pdf.addPage();
+          position = margin - (contentHeight - heightLeft);
+          pdf.addImage(imgData, "PNG", margin, position, contentWidth, contentHeight, undefined, "FAST");
+          heightLeft -= (pdfHeight - margin * 2);
+        }
+      }
+      
+      pdf.save(`Project_Scoping_Brief_${Date.now()}.pdf`);
+      playBeep(587.33, "sine", 0.2);
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
   // State for Discussion Prompts tab
   const [selectedPromptCategory, setSelectedPromptCategory] = useState<string>("kickstart");
 
@@ -403,6 +459,8 @@ export default function App() {
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
   const originalTextRef = useRef<string>("");
+  const briefRef = useRef<HTMLDivElement>(null);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -1349,7 +1407,7 @@ export default function App() {
                     </p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-3xl border-4 border-[#2D3436] shadow-[8px_8px_0px_0px_rgba(45,52,54,1)] overflow-hidden flex flex-col animate-scaleUp">
+                  <div ref={briefRef} className="bg-white rounded-3xl border-4 border-[#2D3436] shadow-[8px_8px_0px_0px_rgba(45,52,54,1)] overflow-hidden flex flex-col animate-scaleUp">
                     
                     {/* Header */}
                     <div className="bg-[#FF6B6B] text-white p-5 border-b-4 border-[#2D3436] flex items-center justify-between">
@@ -1451,6 +1509,24 @@ export default function App() {
                         >
                           <Mail className="w-4 h-4" />
                           <span>{t.questBriefShareEmail}</span>
+                        </button>
+
+                        <button
+                          onClick={exportBriefAsPDF}
+                          disabled={isExportingPdf}
+                          className="flex-1 py-2.5 bg-[#FFE66D] text-[#1A1A1A] hover:bg-[#FFD93D] disabled:opacity-50 font-bold text-xs rounded-xl border-2 border-black flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+                        >
+                          {isExportingPdf ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Generating...</span>
+                            </>
+                          ) : (
+                            <>
+                              <FileText className="w-4 h-4" />
+                              <span>{t.questBriefExportPdf}</span>
+                            </>
+                          )}
                         </button>
                       </div>
 
