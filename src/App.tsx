@@ -292,7 +292,7 @@ const DEFAULT_MILESTONES: Milestone[] = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"prompts" | "questionnaire" | "milestones" | "translator" | "flutter">("prompts");
+  const [activeTab, setActiveTab] = useState<"prompts" | "questionnaire" | "milestones" | "translator" | "flutter" | "help">("prompts");
 
   // Global Interface Language state
   const [appLanguage, setAppLanguage] = useState<SupportedLanguage>(() => {
@@ -997,6 +997,72 @@ export default function App() {
     playBeep(440, "sine", 0.05);
   };
 
+  // States for SDLC Founder Help API
+  const [helpQuestion, setHelpQuestion] = useState("");
+  const [helpLang, setHelpLang] = useState<string>(() => {
+    return appLanguage !== "None" ? appLanguage : "Spanish";
+  });
+  const [helpLevel, setHelpLevel] = useState("simple");
+  const [helpLoading, setHelpLoading] = useState(false);
+  const [helpResult, setHelpResult] = useState<any | null>(null);
+  const [helpError, setHelpError] = useState("");
+
+  useEffect(() => {
+    if (appLanguage !== "None") {
+      setHelpLang(appLanguage);
+    }
+  }, [appLanguage]);
+
+  const handleHelpSubmit = async (e?: React.FormEvent, customQuestion?: string) => {
+    if (e) e.preventDefault();
+    const textToSubmit = customQuestion || helpQuestion;
+    if (!textToSubmit.trim()) return;
+
+    if (customQuestion) {
+      setHelpQuestion(customQuestion);
+    }
+
+    setHelpLoading(true);
+    setHelpError("");
+    setHelpResult(null);
+    playBeep(349.23, "triangle", 0.08); // F4
+
+    try {
+      const response = await fetch("/api/sdlc-help", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: textToSubmit,
+          targetLanguage: helpLang,
+          englishLevel: helpLevel,
+        }),
+      });
+
+      if (!response.ok) {
+        let errorMsg = "The backend API returned an error. Check if your GEMINI_API_KEY is configured in the Secrets panel.";
+        try {
+          const errData = await response.json();
+          if (errData && errData.error) {
+            errorMsg = errData.error;
+          }
+        } catch (_) {}
+        throw new Error(errorMsg);
+      }
+
+      const data = await response.json();
+      setHelpResult(data);
+      playBeep(587.33, "sine", 0.15); // D5 success
+    } catch (err: any) {
+      console.error(err);
+      setHelpError(err.message || "Something went wrong while connecting to the backend. Please try again.");
+      playBeep(220, "sawtooth", 0.3); // Error buzz
+    } finally {
+      setHelpLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FFF9F2] text-[#2D2D2D] font-sans overflow-x-hidden flex flex-col selection:bg-[#FFD93D] selection:text-[#1A1A1A]">
       
@@ -1051,7 +1117,8 @@ export default function App() {
               { id: "questionnaire", label: t.navQuestionnaire, color: "hover:bg-[#4ECDC4] hover:text-white" },
               { id: "milestones", label: t.navChecklist, color: "hover:bg-[#A0D2EB]" },
               { id: "translator", label: t.navTranslator, color: "hover:bg-[#FF6B6B] hover:text-white" },
-              { id: "flutter", label: t.navFlutter, color: "hover:bg-[#FFE66D]" }
+              { id: "flutter", label: t.navFlutter, color: "hover:bg-[#FFE66D]" },
+              { id: "help", label: t.navHelp || "❓ SDLC Founder Help", color: "hover:bg-[#A0D2EB]" }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -2307,6 +2374,369 @@ export default function App() {
             </div>
           );
         })()}
+
+        {/* TAB 6: FOUNDER SDLC HELP DESK */}
+        {activeTab === "help" && (
+          <div className="flex flex-col gap-6 animate-fadeIn">
+            
+            {/* Top Banner */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(45,52,54,1)] border-4 border-[#2D3436] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#A0D2EB]/20 rounded-full blur-2xl -mr-6 -mt-6"></div>
+              <span className="inline-block px-3 py-1 bg-[#A0D2EB] text-[#2D2D2D] rounded-full text-xs font-bold mb-3 border border-[#2D3436] tracking-wide">
+                🎓 FOUNDER EDUCATION
+              </span>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1A1A] mb-3 flex items-center gap-2">
+                <HelpCircle className="w-7 h-7 text-[#FF6B6B]" />
+                SDLC Founder Help Desk
+              </h2>
+              <p className="text-gray-700 text-sm md:text-base leading-relaxed">
+                Do you have questions about how software is built, what developers mean by technical terms, or how different stages of development work? Our Smart Agile Coach explains everything in super simple language using real-life analogies, specifically designed for non-native English speaking founders.
+              </p>
+            </div>
+
+            {/* Layout Split */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              
+              {/* Left Column: Preset Questions and Input Form */}
+              <div className="lg:col-span-5 flex flex-col gap-6">
+                
+                {/* Form card */}
+                <div className="bg-white p-5 md:p-6 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] flex flex-col gap-4">
+                  <h3 className="text-sm font-extrabold text-[#1A1A1A] border-b-2 border-gray-100 pb-2">
+                    💬 Ask a Question
+                  </h3>
+                  
+                  <form onSubmit={(e) => handleHelpSubmit(e)} className="flex flex-col gap-4">
+                    <div>
+                      <label className="block text-xs font-extrabold text-gray-500 uppercase tracking-widest mb-1.5">
+                        Your Question (English or your native language)
+                      </label>
+                      <textarea
+                        value={helpQuestion}
+                        onChange={(e) => setHelpQuestion(e.target.value)}
+                        placeholder="e.g. What is QA testing? Why does it take so long? Or ask in your language!"
+                        className="w-full h-28 p-3 rounded-2xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs font-semibold resize-none bg-[#FFFDFB]"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-extrabold text-gray-500 uppercase tracking-widest mb-1.5">
+                          Native language
+                        </label>
+                        <select
+                          value={helpLang}
+                          onChange={(e) => {
+                            setHelpLang(e.target.value);
+                            playBeep(440, "sine", 0.05);
+                          }}
+                          className="w-full p-2.5 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs font-bold bg-white"
+                        >
+                          {LANGUAGES.map((lang) => (
+                            <option key={lang.code} value={lang.code}>
+                              {lang.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-extrabold text-gray-500 uppercase tracking-widest mb-1.5">
+                          Simplicity
+                        </label>
+                        <div className="grid grid-cols-2 gap-1 bg-gray-100 p-1 rounded-xl">
+                          {["simple", "medium"].map((lvl) => (
+                            <button
+                              key={lvl}
+                              type="button"
+                              onClick={() => {
+                                setHelpLevel(lvl);
+                                playBeep(440, "sine", 0.05);
+                              }}
+                              className={`py-1.5 text-[10px] font-extrabold rounded-lg capitalize transition-all ${
+                                helpLevel === lvl
+                                  ? "bg-white text-black shadow-sm border border-gray-200"
+                                  : "text-gray-500 hover:text-black"
+                              }`}
+                            >
+                              {lvl === "simple" ? "A2 Level" : "B1 Level"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={helpLoading || !helpQuestion.trim()}
+                      className={`w-full py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all duration-150 border-2 border-black flex items-center justify-center gap-2 cursor-pointer ${
+                        helpLoading || !helpQuestion.trim()
+                          ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
+                          : "bg-[#4ECDC4] hover:bg-[#3dbbb2] text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                      }`}
+                    >
+                      {helpLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Agile Coach is Thinking...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 text-[#FFE66D]" />
+                          <span>Ask Smart Agile Coach ✨</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Preset Suggestions */}
+                <div className="bg-[#FFFDFB] p-5 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] flex flex-col gap-3">
+                  <span className="text-xs font-extrabold text-[#2D2D2D] uppercase tracking-wide">
+                    💡 Common Founder Questions (Click to Ask):
+                  </span>
+                  <div className="flex flex-col gap-2">
+                    {[
+                      {
+                        q: "What is an MVP (Minimum Viable Product) and why do we start with it?",
+                        short: "What is an MVP?"
+                      },
+                      {
+                        q: "What is the difference between Frontend and Backend, and why is the database separate?",
+                        short: "Frontend vs Backend & Database"
+                      },
+                      {
+                        q: "What does Agile mean and what are Sprints?",
+                        short: "What is Agile & Sprints?"
+                      },
+                      {
+                        q: "What is the difference between a Web App and a Native Mobile App?",
+                        short: "Web App vs Mobile App"
+                      },
+                      {
+                        q: "What is QA/Testing, and why does it take so much time?",
+                        short: "What is QA & Testing?"
+                      },
+                      {
+                        q: "What is a Staging Environment, and why is it different from Production?",
+                        short: "Staging vs Production"
+                      },
+                      {
+                        q: "How do API integrations and API Keys work?",
+                        short: "How do APIs & Keys work?"
+                      }
+                    ].map((item, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          handleHelpSubmit(undefined, item.q);
+                        }}
+                        disabled={helpLoading}
+                        className="text-left p-3 rounded-xl border-2 border-gray-200 hover:border-[#FF6B6B] hover:bg-[#FF6B6B]/5 transition-all text-xs font-semibold text-gray-700 bg-white cursor-pointer active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        ❓ {item.q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: AI Explainer Result */}
+              <div className="lg:col-span-7">
+                
+                {/* Default state */}
+                {!helpLoading && !helpResult && !helpError && (
+                  <div className="bg-white p-8 rounded-3xl border-4 border-dashed border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] text-center py-20 flex flex-col items-center justify-center gap-4">
+                    <div className="w-16 h-16 bg-[#FFE66D] rounded-full border-2 border-black flex items-center justify-center text-2xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      🎓
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-[#1A1A1A] mb-1">
+                        Agile Coach Ready to Help
+                      </h4>
+                      <p className="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
+                        Click any of the common questions on the left or type your own question, and our friendly Coach will explain it in simple words with concrete action steps!
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Loading state */}
+                {helpLoading && (
+                  <div className="bg-white p-8 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] text-center py-24 flex flex-col items-center justify-center gap-6 animate-pulse">
+                    <Loader2 className="w-12 h-12 text-[#4ECDC4] animate-spin" />
+                    <div>
+                      <h4 className="font-extrabold text-[#1A1A1A] text-base mb-1">
+                        Connecting with Agile Coach...
+                      </h4>
+                      <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">
+                        Translating complex software development and Agile processes into simple words and engaging daily analogies.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Error state */}
+                {helpError && (
+                  <div className="bg-white p-6 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] border-l-[#FF6B6B] border-l-8 flex flex-col gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">⚠️</span>
+                      <h4 className="font-extrabold text-[#1A1A1A] text-sm">Agile Coach Encountered a Block</h4>
+                    </div>
+                    <p className="text-xs text-red-600 font-semibold bg-red-50 p-3 rounded-xl border border-red-200 leading-relaxed">
+                      {helpError}
+                    </p>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      Please make sure you have set a valid <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-red-500 font-bold">GEMINI_API_KEY</span> in the **Settings &gt; Secrets** panel in AI Studio.
+                    </p>
+                    <button
+                      onClick={() => handleHelpSubmit()}
+                      className="py-2.5 px-4 bg-[#FFE66D] hover:bg-[#ffd11a] text-xs font-bold rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] self-start"
+                    >
+                      🔄 Try Again
+                    </button>
+                  </div>
+                )}
+
+                {/* Result Display */}
+                {helpResult && (
+                  <div className="flex flex-col gap-5 animate-fadeIn">
+                    
+                    {/* Main result card */}
+                    <div className="bg-white p-6 rounded-3xl border-4 border-[#2D3436] shadow-[6px_6px_0px_0px_rgba(45,52,54,1)] flex flex-col gap-5">
+                      
+                      {/* Card Header */}
+                      <div className="border-b-2 border-gray-100 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
+                            FOUNDER SDLC GUIDE
+                          </span>
+                          <h4 className="text-xs font-extrabold text-[#1A1A1A] leading-snug mt-1 italic">
+                            "{helpResult.question}"
+                          </h4>
+                        </div>
+                        <span className="self-start px-2.5 py-1 bg-[#FFE66D] text-black font-extrabold text-[10px] rounded-full border border-black uppercase tracking-wide shadow-sm">
+                          {helpLevel === "simple" ? "Very Simple (A2)" : "Medium (B1)"}
+                        </span>
+                      </div>
+
+                      {/* Direct Simple Explanation */}
+                      <div className="bg-gray-50 p-4 rounded-2xl border-2 border-gray-200 relative overflow-hidden">
+                        <span className="absolute top-0 right-0 bg-teal-500 text-black font-extrabold text-[9px] px-2.5 py-0.5 rounded-bl-lg border-l border-b border-black uppercase">
+                          The Plain Explanation
+                        </span>
+                        <h4 className="text-xs font-extrabold text-[#1A1A1A] mb-2 flex items-center gap-1">
+                          <span>💡</span> Clear Answer:
+                        </h4>
+                        <p className="text-xs font-semibold text-gray-800 leading-relaxed">
+                          {helpResult.simpleAnswer}
+                        </p>
+                      </div>
+
+                      {/* Analogy Box */}
+                      {helpResult.analogy && (
+                        <div className="bg-[#FFE66D]/10 p-5 rounded-2xl border-2 border-[#FFE66D] relative overflow-hidden">
+                          <span className="absolute top-0 right-0 bg-[#FFE66D] text-[#1A1A1A] font-extrabold text-[9px] px-2.5 py-0.5 rounded-bl-lg border-l border-b border-black uppercase tracking-wider">
+                            DAILY ANALOGY
+                          </span>
+                          <h4 className="text-xs font-extrabold text-[#1A1A1A] mb-2 flex items-center gap-1.5">
+                            <span>🦖</span> {helpResult.analogy.title || "Simple Analogy"}
+                          </h4>
+                          <p className="text-xs text-gray-700 leading-relaxed italic font-medium">
+                            "{helpResult.analogy.description}"
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Vocabulary list */}
+                      {helpResult.vocabulary && helpResult.vocabulary.length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-extrabold text-[#1A1A1A] mb-3 uppercase tracking-wide flex items-center gap-1.5">
+                            <span>📖</span> Key Terms to Learn:
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {helpResult.vocabulary.map((vocab: any, i: number) => (
+                              <div key={i} className="p-3 bg-[#FFF9F2] rounded-xl border-2 border-orange-200">
+                                <span className="text-xs font-bold text-[#FF6B6B] block mb-1">
+                                  {vocab.term}
+                                </span>
+                                <p className="text-[11px] text-gray-600 font-medium leading-relaxed">
+                                  {vocab.simpleDefinition}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Checklist */}
+                      {helpResult.checklist && helpResult.checklist.length > 0 && (
+                        <div className="border-t-2 border-gray-100 pt-4">
+                          <h4 className="text-xs font-extrabold text-[#1A1A1A] mb-3 uppercase tracking-wide flex items-center gap-1.5">
+                            <span>✅</span> Your Next Steps as a Founder:
+                          </h4>
+                          <div className="flex flex-col gap-2">
+                            {helpResult.checklist.map((item: any, i: number) => (
+                              <div key={i} className="flex gap-2.5 items-start p-2.5 bg-green-50 rounded-xl border-2 border-green-200">
+                                <CheckSquare className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+                                <div>
+                                  <span className="text-[11px] font-bold text-[#1A1A1A] block">
+                                    {item.action}
+                                  </span>
+                                  <p className="text-[10px] text-gray-500 leading-normal">
+                                    {item.why}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Native language translation / summary */}
+                      {helpLang !== "None" && helpResult.translation && (
+                        <div className="bg-[#4ECDC4]/10 p-4 rounded-xl border-2 border-[#4ECDC4] mt-1">
+                          <span className="text-[10px] font-bold text-[#4ECDC4] uppercase tracking-widest block mb-1">
+                            🌎 Native Language Summary ({helpLang}):
+                          </span>
+                          <p className="text-xs font-semibold text-gray-800 leading-relaxed">
+                            {helpResult.translation}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Copy and Share button */}
+                      <button
+                        onClick={() => {
+                          const rawShare = `FOUNDER SDLC EXPLAINER\nQuestion: ${helpResult.question}\n\n1. Answer:\n${helpResult.simpleAnswer}\n\n2. Analogy (${helpResult.analogy?.title}):\n${helpResult.analogy?.description}\n\n3. Terms:\n${helpResult.vocabulary?.map((v: any) => `- ${v.term}: ${v.simpleDefinition}`).join("\n")}\n\n4. Actions:\n${helpResult.checklist?.map((c: any) => `- ${c.action} (Why: ${c.why})`).join("\n")}${helpLang !== "None" && helpResult.translation ? `\n\n5. Translation (${helpLang}):\n${helpResult.translation}` : ""}`;
+                          handleCopy(rawShare, "copy-help-result");
+                        }}
+                        className="w-full py-2.5 bg-gray-50 hover:bg-[#FFE66D] text-xs font-extrabold rounded-xl border-2 border-[#2D3436] flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                      >
+                        {copiedText === "copy-help-result" ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-green-500" strokeWidth={2.5} />
+                            <span>Explainer Copied to Clipboard!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-gray-500" />
+                            <span>Copy Full Guide to Clipboard</span>
+                          </>
+                        )}
+                      </button>
+
+                    </div>
+                  </div>
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+        )}
 
       </main>
 

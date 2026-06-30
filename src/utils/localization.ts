@@ -9,6 +9,7 @@ export interface Translations {
   navChecklist: string;
   navTranslator: string;
   navFlutter: string;
+  navHelp?: string;
   
   // Tab 1: Prompts
   promptsBannerTag: string;
@@ -114,6 +115,7 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navChecklist: "📋 Alignment Checklist",
     navTranslator: "🌎 Layman Translator",
     navFlutter: "📱 Flutter & Stitch Dev",
+    navHelp: "❓ SDLC Founder Help",
     
     promptsBannerTag: "🗣️ MEETING LAUNCHER",
     promptsBannerTitle: "Client Discussion Kickstarters",

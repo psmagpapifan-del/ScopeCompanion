@@ -144,6 +144,128 @@ Provide the response in the specified JSON format with an engaging everyday anal
   }
 });
 
+// API endpoint to answer founder questions about the Software Development Lifecycle (SDLC)
+app.post("/api/sdlc-help", async (req, res) => {
+  try {
+    const { question, targetLanguage, englishLevel } = req.body;
+    if (!question || typeof question !== "string") {
+      res.status(400).json({ error: "Missing or invalid 'question' parameter." });
+      return;
+    }
+
+    const ai = getGeminiClient();
+
+    let languageInstruction = "";
+    if (targetLanguage && targetLanguage !== "None") {
+      languageInstruction = `Also, provide a warm 2-3 sentence translation or clear summary of the core concepts in ${targetLanguage} in the 'translation' field so they can understand in their native language.`;
+    }
+
+    const systemInstruction = `You are a friendly, patient, and expert Agile Software Coach who specializes in guiding non-technical, non-native English speaking business founders through the Software Development Lifecycle (SDLC).
+Your goal is to answer their questions about building software, development processes, and industry jargon in extremely simple language (A2 to B1 English level).
+
+Strict guidelines:
+1. Break down technical concepts (sprints, staging, backend, databases, APIs, repository) into daily, everyday analogies (like restaurant operations, building a physical shop, sending mail).
+2. Avoid idioms, complex grammar, and dry academic jargon.
+3. Be supportive, practical, and action-oriented. Provide realistic, human answers.
+4. ${languageInstruction}`;
+
+    const prompt = `A business founder asks: "${question}". 
+Target simplicity level: ${englishLevel || "simple"}.
+Provide a clear explanation and real-life analogy, define any tricky words, and list 2-3 action steps they should take next.`;
+
+    const generateConfig = {
+      systemInstruction: systemInstruction,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          question: {
+            type: Type.STRING,
+            description: "The original question asked by the user."
+          },
+          simpleAnswer: {
+            type: Type.STRING,
+            description: "A very simple, encouraging, and clear answer in extremely plain English (A2-B1 level) explaining the SDLC concept."
+          },
+          analogy: {
+            type: Type.OBJECT,
+            properties: {
+              title: { type: Type.STRING, description: "A creative, friendly title for the everyday analogy." },
+              description: { type: Type.STRING, description: "The story or explanation of the analogy in plain words." }
+            },
+            required: ["title", "description"]
+          },
+          vocabulary: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                term: { type: Type.STRING, description: "The complex software development or SDLC term used." },
+                simpleDefinition: { type: Type.STRING, description: "A very clear, 1-sentence explanation of what it means in human words." }
+              },
+              required: ["term", "simpleDefinition"]
+            },
+            description: "2 or 3 technical terms that are helpful to know for this topic."
+          },
+          checklist: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                action: { type: Type.STRING, description: "A specific, simple task for the founder (e.g. 'Ask your developers to show you the staging app')." },
+                why: { type: Type.STRING, description: "A brief, plain-English explanation of why this step is helpful." }
+              },
+              required: ["action", "why"]
+            },
+            description: "2 or 3 practical, concrete next steps the founder can take."
+          },
+          translation: {
+            type: Type.STRING,
+            description: "If a target language was specified, a clear 2-3 sentence summary of the key takeaways in that target language. Otherwise, leave empty."
+          }
+        },
+        required: ["question", "simpleAnswer", "analogy", "vocabulary", "checklist", "translation"]
+      }
+    };
+
+    let response;
+    try {
+      console.log("Attempting SDLC Help generation using primary model: gemini-2.5-flash");
+      response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: generateConfig
+      });
+    } catch (primaryError: any) {
+      console.warn("Primary model failed for SDLC Help, trying fallback (gemini-1.5-flash). Error:", primaryError);
+      try {
+        response = await ai.models.generateContent({
+          model: "gemini-1.5-flash",
+          contents: prompt,
+          config: generateConfig
+        });
+      } catch (fallbackError: any) {
+        console.error("Fallback model also failed for SDLC Help. Error:", fallbackError);
+        throw new Error(`AI service is currently unavailable. Primary error: ${primaryError.message || primaryError}. Fallback error: ${fallbackError.message || fallbackError}`);
+      }
+    }
+
+    const resultText = response.text;
+    if (!resultText) {
+      throw new Error("No response received from Gemini.");
+    }
+
+    const parsed = JSON.parse(resultText.trim());
+    res.json(parsed);
+
+  } catch (error: any) {
+    console.error("Error in /api/sdlc-help:", error);
+    res.status(500).json({
+      error: error.message || "An unexpected error occurred while communicating with the AI service."
+    });
+  }
+});
+
 // Vite middleware or static serving setup
 async function setupServer() {
   if (process.env.NODE_ENV !== "production") {
