@@ -947,6 +947,19 @@ export default function App() {
   const [translatorResult, setTranslatorResult] = useState<any | null>(null);
   const [translatorError, setTranslatorError] = useState("");
 
+  const getApiKey = async (): Promise<string> => {
+    try {
+      const res = await fetch("/key.json");
+      if (!res.ok) throw new Error("Could not load key.json");
+      const data = await res.json();
+      if (!data.apiKey) throw new Error("apiKey not found in key.json");
+      return data.apiKey;
+    } catch (err: any) {
+      console.error("Error loading Gemini API key from key.json:", err);
+      throw new Error("Gemini API key is not configured. Please ensure public/key.json contains { \"apiKey\": \"...\" }.");
+    }
+  };
+
   const handleTranslatorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!translatorText.trim()) return;
@@ -957,35 +970,114 @@ export default function App() {
     playBeep(349.23, "triangle", 0.08); // F4
 
     try {
-      const response = await fetch("/api/simplify", {
+      const apiKey = await getApiKey();
+
+      const systemInstruction = `You are a friendly, patient, and expert Agile Software Coach who specializes in guiding non-technical, non-native English speaking business founders through the Software Development Lifecycle (SDLC).
+Your goal is to translate and simplify complex technical terms, jargon, or tools (like Git, API, WebSockets, DB, Cloud) into extremely simple language (A2 to B1 English level) with relatable daily analogies (e.g. kitchen operations, sending letters, physical storefronts).
+
+Strict guidelines:
+1. Break down the concept into an everyday analogy.
+2. Keep definitions short, clear, and direct. Avoid idioms, complex grammar, and dry academic language.
+3. If a target language is specified, provide a clear 1-2 sentence translation or explanation in that target language at the end of the response in the 'translation' field. Otherwise, leave the 'translation' field empty.`;
+
+      const promptText = `Translate and simplify this tech term/concept: "${translatorText}". 
+Target simplicity level: ${translatorLevel || "simple"}.
+${translatorLang && translatorLang !== "None" ? `Also provide a translation or equivalent explanation in ${translatorLang} in the 'translation' field.` : ""}`;
+
+      const apiBody = {
+        contents: [
+          {
+            parts: [
+              {
+                text: promptText
+              }
+            ]
+          }
+        ],
+        systemInstruction: {
+          parts: [
+            {
+              text: systemInstruction
+            }
+          ]
+        },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              term: {
+                type: "string",
+                description: "The simplified name of the tech term."
+              },
+              shortDefinition: {
+                type: "string",
+                description: "A very brief (1 sentence) explanation in extremely simple English."
+              },
+              analogyTitle: {
+                type: "string",
+                description: "A creative title for the everyday analogy."
+              },
+              analogyText: {
+                type: "string",
+                description: "The explanation of the analogy in simple words."
+              },
+              simpleExplanation: {
+                type: "string",
+                description: "A warm, easy-to-read explanation of what the technology does and why a founder should care."
+              },
+              keyPoints: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string", description: "The title of the key takeaway." },
+                    description: { type: "string", description: "A super simple 1-sentence detail." }
+                  }
+                },
+                description: "2 or 3 super easy key takeaways."
+              },
+              translation: {
+                type: "string",
+                description: "If a target language was specified, a warm 1-2 sentence translation or equivalent explanation in that target language. Otherwise, leave empty."
+              }
+            },
+            required: ["term", "shortDefinition", "analogyTitle", "analogyText", "simpleExplanation", "keyPoints", "translation"]
+          }
+        }
+      };
+
+      const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          text: translatorText,
-          targetLanguage: translatorLang,
-          englishLevel: translatorLevel,
-        }),
+        body: JSON.stringify(apiBody)
       });
 
-      if (!response.ok) {
-        let errorMsg = "The backend API returned an error. Check if your GEMINI_API_KEY is configured in the Secrets panel.";
+      if (!apiRes.ok) {
+        let errorMsg = "The Gemini API returned an error.";
         try {
-          const errData = await response.json();
-          if (errData && errData.error) {
-            errorMsg = errData.error;
+          const errData = await apiRes.json();
+          if (errData && errData.error && errData.error.message) {
+            errorMsg = errData.error.message;
           }
         } catch (_) {}
         throw new Error(errorMsg);
       }
 
-      const data = await response.json();
-      setTranslatorResult(data);
+      const resData = await apiRes.json();
+      const textResult = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!textResult) {
+        throw new Error("Empty response received from Gemini.");
+      }
+
+      const parsedData = JSON.parse(textResult.trim());
+      setTranslatorResult(parsedData);
       playBeep(587.33, "sine", 0.15); // D5 success
     } catch (err: any) {
       console.error(err);
-      setTranslatorError(err.message || "Something went wrong while connecting to the backend. Please try again.");
+      setTranslatorError(err.message || "Something went wrong while connecting to the Gemini API. Please try again.");
       playBeep(220, "sawtooth", 0.3); // Error buzz
     } finally {
       setTranslatorLoading(false);
@@ -1028,35 +1120,129 @@ export default function App() {
     playBeep(349.23, "triangle", 0.08); // F4
 
     try {
-      const response = await fetch("/api/sdlc-help", {
+      const apiKey = await getApiKey();
+
+      let languageInstruction = "";
+      if (helpLang && helpLang !== "None") {
+        languageInstruction = `Also, provide a warm 2-3 sentence translation or clear summary of the core concepts in ${helpLang} in the 'translation' field so they can understand in their native language.`;
+      }
+
+      const systemInstruction = `You are a friendly, patient, and expert Agile Software Coach who specializes in guiding non-technical, non-native English speaking business founders through the Software Development Lifecycle (SDLC).
+Your goal is to answer their questions about building software, development processes, and industry jargon in extremely simple language (A2 to B1 English level).
+
+Strict guidelines:
+1. Break down technical concepts (sprints, staging, backend, databases, APIs, repository) into daily, everyday analogies (like restaurant operations, building a physical shop, sending mail).
+2. Avoid idioms, complex grammar, and dry academic jargon.
+3. Be supportive, practical, and action-oriented. Provide realistic, human answers.
+4. ${languageInstruction}`;
+
+      const promptText = `A business founder asks: "${textToSubmit}". 
+Target simplicity level: ${helpLevel || "simple"}.
+Provide a clear explanation and real-life analogy, define any tricky words, and list 2-3 action steps they should take next.`;
+
+      const apiBody = {
+        contents: [
+          {
+            parts: [
+              {
+                text: promptText
+              }
+            ]
+          }
+        ],
+        systemInstruction: {
+          parts: [
+            {
+              text: systemInstruction
+            }
+          ]
+        },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              question: {
+                type: "string",
+                description: "The original question asked by the user."
+              },
+              simpleAnswer: {
+                type: "string",
+                description: "A very simple, encouraging, and clear answer in extremely plain English (A2-B1 level) explaining the SDLC concept."
+              },
+              analogy: {
+                type: "object",
+                properties: {
+                  title: { type: "string", description: "A creative, friendly title for the everyday analogy." },
+                  description: { type: "string", description: "The story or explanation of the analogy in plain words." }
+                },
+                required: ["title", "description"]
+              },
+              vocabulary: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    term: { type: "string", description: "The complex software development or SDLC term used." },
+                    simpleDefinition: { type: "string", description: "A very clear, 1-sentence explanation of what it means in human words." }
+                  },
+                  required: ["term", "simpleDefinition"]
+                },
+                description: "2 or 3 technical terms that are helpful to know for this topic."
+              },
+              checklist: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    action: { type: "string", description: "A specific, simple task for the founder (e.g. 'Ask your developers to show you the staging app')." },
+                    why: { type: "string", description: "A brief, plain-English explanation of why this step is helpful." }
+                  },
+                  required: ["action", "why"]
+                },
+                description: "2 or 3 practical, concrete next steps the founder can take."
+              },
+              translation: {
+                type: "string",
+                description: "If a target language was specified, a clear 2-3 sentence summary of the key takeaways in that target language. Otherwise, leave empty."
+              }
+            },
+            required: ["question", "simpleAnswer", "analogy", "vocabulary", "checklist", "translation"]
+          }
+        }
+      };
+
+      const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          question: textToSubmit,
-          targetLanguage: helpLang,
-          englishLevel: helpLevel,
-        }),
+        body: JSON.stringify(apiBody)
       });
 
-      if (!response.ok) {
-        let errorMsg = "The backend API returned an error. Check if your GEMINI_API_KEY is configured in the Secrets panel.";
+      if (!apiRes.ok) {
+        let errorMsg = "The Gemini API returned an error.";
         try {
-          const errData = await response.json();
-          if (errData && errData.error) {
-            errorMsg = errData.error;
+          const errData = await apiRes.json();
+          if (errData && errData.error && errData.error.message) {
+            errorMsg = errData.error.message;
           }
         } catch (_) {}
         throw new Error(errorMsg);
       }
 
-      const data = await response.json();
-      setHelpResult(data);
+      const resData = await apiRes.json();
+      const textResult = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!textResult) {
+        throw new Error("Empty response received from Gemini.");
+      }
+
+      const parsedData = JSON.parse(textResult.trim());
+      setHelpResult(parsedData);
       playBeep(587.33, "sine", 0.15); // D5 success
     } catch (err: any) {
       console.error(err);
-      setHelpError(err.message || "Something went wrong while connecting to the backend. Please try again.");
+      setHelpError(err.message || "Something went wrong while connecting to the Gemini API. Please try again.");
       playBeep(220, "sawtooth", 0.3); // Error buzz
     } finally {
       setHelpLoading(false);
