@@ -9,6 +9,7 @@ import {
   Mail, 
   PenTool, 
   ArrowRight, 
+  ArrowLeft,
   CheckSquare, 
   FileText, 
   Copy, 
@@ -22,6 +23,7 @@ import {
   ShieldCheck, 
   Layers, 
   Volume2,
+  VolumeX,
   ListTodo,
   Smartphone,
   Cpu,
@@ -302,6 +304,19 @@ export default function App() {
   const [sandboxResult, setSandboxResult] = useState<any | null>(null);
   const [sandboxError, setSandboxError] = useState("");
 
+  // UX Chief variables
+  const [soundMuted, setSoundMuted] = useState(() => {
+    return localStorage.getItem("scoping_companion_sound_muted") === "true";
+  });
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 2500);
+  };
+
   // Global Interface Language state
   const [appLanguage, setAppLanguage] = useState<SupportedLanguage>(() => {
     const saved = localStorage.getItem("scoping_companion_app_lang");
@@ -324,6 +339,7 @@ export default function App() {
   
   // Custom audio synth feedback
   const playBeep = (freq: number, type: OscillatorType = "sine", duration: number = 0.1) => {
+    if (soundMuted) return;
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const osc = audioCtx.createOscillator();
@@ -348,6 +364,7 @@ export default function App() {
     navigator.clipboard.writeText(text);
     setCopiedText(id);
     playBeep(587.33, "sine", 0.15); // D5 success note
+    showToast("Copied to clipboard! 📋");
     setTimeout(() => setCopiedText(null), 2000);
   };
 
@@ -1385,8 +1402,21 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
         <div className="max-w-6xl mx-auto flex flex-col gap-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             
-            {/* Logo & App title with bright aesthetic badge */}
+            {/* Back Button & Logo & App title with bright aesthetic badge */}
             <div className="flex items-center gap-3">
+              {activeTab !== "prompts" && (
+                <button
+                  onClick={() => {
+                    setActiveTab("prompts");
+                    playBeep(440, "sine", 0.05);
+                  }}
+                  className="p-2.5 bg-white hover:bg-gray-50 rounded-2xl border-4 border-[#2D3436] shadow-[3px_3px_0px_0px_rgba(45,52,54,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(45,52,54,1)] transition-all cursor-pointer flex items-center justify-center shrink-0"
+                  aria-label="Back to Prompts"
+                  title="Back to Prompts"
+                >
+                  <ArrowLeft className="w-5 h-5 text-[#2D3436]" strokeWidth={3} />
+                </button>
+              )}
               <div className="w-12 h-12 bg-[#FF6B6B] rounded-2xl flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] border-2 border-[#2D3436]">
                 <span className="text-2xl text-white">🤝</span>
               </div>
@@ -1403,23 +1433,61 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
               </div>
             </div>
 
-            {/* Global Language Selector */}
-            <div className="flex items-center gap-2 text-xs font-bold shrink-0 bg-white p-2 rounded-xl border-2 border-[#2D3436] shadow-[2px_2px_0px_0px_rgba(45,52,54,1)]">
-              <span className="text-[#2D2D2D]/65 flex items-center gap-1.5">
-                <Languages className="w-3.5 h-3.5 text-[#FF6B6B]" />
-                <span>{t.interfaceLanguageSelector}</span>
-              </span>
-              <select
-                value={appLanguage}
-                onChange={(e) => handleAppLanguageChange(e.target.value as SupportedLanguage)}
-                className="bg-white text-[#2D2D2D] font-extrabold py-0.5 px-2 rounded focus:outline-none focus:ring-0 cursor-pointer"
+            {/* Global Settings & Language Selector */}
+            <div className="flex items-center gap-3 shrink-0">
+              
+              {/* Mute Audio switch */}
+              <button
+                onClick={() => {
+                  const newMuted = !soundMuted;
+                  setSoundMuted(newMuted);
+                  localStorage.setItem("scoping_companion_sound_muted", String(newMuted));
+                  if (!newMuted) {
+                    // Try to play a quick beep to confirm unmuting
+                    try {
+                      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                      const osc = audioCtx.createOscillator();
+                      const gain = audioCtx.createGain();
+                      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                      gain.connect(audioCtx.destination);
+                      osc.connect(gain);
+                      osc.start();
+                      osc.stop(audioCtx.currentTime + 0.1);
+                    } catch (_) {}
+                  }
+                }}
+                className={`p-2 rounded-xl border-2 border-[#2D3436] shadow-[2px_2px_0px_0px_rgba(45,52,54,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(45,52,54,1)] transition-all cursor-pointer flex items-center justify-center ${
+                  soundMuted ? "bg-red-100 hover:bg-red-200" : "bg-green-100 hover:bg-green-200"
+                }`}
+                title={soundMuted ? "Unmute sound feedback" : "Mute sound feedback"}
+                aria-label={soundMuted ? "Unmute sound feedback" : "Mute sound feedback"}
               >
-                {LANGUAGES.map((lang) => (
-                  <option key={lang.code} value={lang.code}>
-                    {lang.name}
-                  </option>
-                ))}
-              </select>
+                {soundMuted ? (
+                  <VolumeX className="w-4 h-4 text-red-600" />
+                ) : (
+                  <Volume2 className="w-4 h-4 text-green-700" />
+                )}
+              </button>
+
+              {/* Global Language Selector */}
+              <div className="flex items-center gap-2 text-xs font-bold bg-white p-2 rounded-xl border-2 border-[#2D3436] shadow-[2px_2px_0px_0px_rgba(45,52,54,1)]">
+                <span className="text-[#2D2D2D]/65 flex items-center gap-1.5">
+                  <Languages className="w-3.5 h-3.5 text-[#FF6B6B]" />
+                  <span>{t.interfaceLanguageSelector}</span>
+                </span>
+                <select
+                  value={appLanguage}
+                  onChange={(e) => handleAppLanguageChange(e.target.value as SupportedLanguage)}
+                  className="bg-white text-[#2D2D2D] font-extrabold py-0.5 px-2 rounded focus:outline-none focus:ring-0 cursor-pointer"
+                >
+                  {LANGUAGES.map((lang) => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
             </div>
 
           </div>
@@ -2367,23 +2435,37 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                 </div>
 
                 {/* Submit */}
-                <button
-                  type="submit"
-                  disabled={translatorLoading}
-                  className="w-full mt-1 bg-[#FF6B6B] hover:bg-[#FF6B6B]/90 disabled:bg-gray-400 text-white font-extrabold py-3 rounded-xl shadow-md border-2 border-black flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer text-xs md:text-sm"
-                >
-                  {translatorLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>{t.transSubmitBtnThinking}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      <span>{t.transSubmitBtnReady}</span>
-                    </>
-                  )}
-                </button>
+                <div className="grid grid-cols-3 gap-2 mt-1">
+                  <button
+                    type="submit"
+                    disabled={translatorLoading}
+                    className="col-span-2 bg-[#FF6B6B] hover:bg-[#FF6B6B]/90 disabled:bg-gray-400 text-white font-extrabold py-3 rounded-xl shadow-md border-2 border-black flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer text-xs md:text-sm"
+                  >
+                    {translatorLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>{t.transSubmitBtnThinking}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        <span>{t.transSubmitBtnReady}</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTranslatorText("");
+                      setTranslatorResult(null);
+                      setTranslatorError("");
+                      playBeep(330, "sine", 0.05);
+                    }}
+                    className="bg-white hover:bg-gray-100 text-[#2D2D2D] font-extrabold py-3 rounded-xl shadow-md border-2 border-black flex items-center justify-center transition-all active:scale-95 cursor-pointer text-xs md:text-sm"
+                  >
+                    Clear
+                  </button>
+                </div>
 
                 {translatorError && (
                   <div className="p-3 bg-red-100 text-red-800 text-xs font-bold rounded-xl border border-red-200">
@@ -2781,27 +2863,41 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                       </div>
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={helpLoading || !helpQuestion.trim()}
-                      className={`w-full py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all duration-150 border-2 border-black flex items-center justify-center gap-2 cursor-pointer ${
-                        helpLoading || !helpQuestion.trim()
-                          ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
-                          : "bg-[#4ECDC4] hover:bg-[#3dbbb2] text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-                      }`}
-                    >
-                      {helpLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Agile Coach is Thinking...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4 text-[#FFE66D]" />
-                          <span>Ask Smart Agile Coach ✨</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="submit"
+                        disabled={helpLoading || !helpQuestion.trim()}
+                        className={`col-span-2 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all duration-150 border-2 border-black flex items-center justify-center gap-2 cursor-pointer ${
+                          helpLoading || !helpQuestion.trim()
+                            ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
+                            : "bg-[#4ECDC4] hover:bg-[#3dbbb2] text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                        }`}
+                      >
+                        {helpLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Thinking...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 text-[#FFE66D]" />
+                            <span>Ask Coach ✨</span>
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHelpQuestion("");
+                          setHelpResult(null);
+                          setHelpError("");
+                          playBeep(330, "sine", 0.05);
+                        }}
+                        className="py-3 bg-gray-100 hover:bg-gray-200 text-xs md:text-sm font-extrabold rounded-2xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </form>
                 </div>
 
@@ -3113,23 +3209,37 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                       />
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={sandboxLoading || !sandboxPitch.trim()}
-                      className="w-full py-3 bg-[#FFD93D] hover:bg-[#FFE66D] disabled:opacity-50 text-xs md:text-sm font-extrabold rounded-2xl border-4 border-[#2D3436] shadow-[3px_3px_0px_0px_rgba(45,52,54,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(45,52,54,1)] transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      {sandboxLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Evaluating explainer...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4 text-orange-600 animate-pulse" />
-                          <span>Evaluate Explainer! 🤖</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="submit"
+                        disabled={sandboxLoading || !sandboxPitch.trim()}
+                        className="col-span-2 py-3 bg-[#FFD93D] hover:bg-[#FFE66D] disabled:opacity-50 text-xs md:text-sm font-extrabold rounded-2xl border-4 border-[#2D3436] shadow-[3px_3px_0px_0px_rgba(45,52,54,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(45,52,54,1)] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        {sandboxLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Evaluating...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 text-orange-600 animate-pulse" />
+                            <span>Evaluate! 🤖</span>
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSandboxPitch("");
+                          setSandboxResult(null);
+                          setSandboxError("");
+                          playBeep(330, "sine", 0.05);
+                        }}
+                        className="py-3 bg-gray-100 hover:bg-gray-200 text-xs md:text-sm font-extrabold rounded-2xl border-4 border-[#2D3436] shadow-[3px_3px_0px_0px_rgba(45,52,54,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(45,52,54,1)] transition-all flex items-center justify-center cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </form>
                 </div>
 
@@ -3327,6 +3437,14 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
           </div>
         </div>
       </footer>
+
+      {/* Neo-Brutalist Toast Alert notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#FF6B6B] text-white px-5 py-3 rounded-2xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] font-bold text-xs md:text-sm flex items-center gap-2 animate-scaleUp">
+          <span>✨</span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
     </div>
   );
