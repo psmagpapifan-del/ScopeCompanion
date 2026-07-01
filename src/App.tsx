@@ -1820,7 +1820,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                     value={q1}
                     onChange={(e) => setQ1(e.target.value)}
                     placeholder="e.g., A mobile app where users find dog walkers near their hotel..."
-                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs md:text-sm font-medium"
+                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-base md:text-sm font-medium"
                     required
                   />
                 </div>
@@ -1868,7 +1868,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                     value={q2}
                     onChange={(e) => setQ2(e.target.value)}
                     placeholder="e.g., Families traveling with pets who don't have local contacts..."
-                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs md:text-sm font-medium"
+                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-base md:text-sm font-medium"
                     required
                   />
                 </div>
@@ -1916,7 +1916,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                     value={q3}
                     onChange={(e) => setQ3(e.target.value)}
                     placeholder="1. Walk booking calendar&#10;2. Direct text alerts to dog owners&#10;3. Simple photo uploads..."
-                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs md:text-sm font-medium"
+                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-base md:text-sm font-medium"
                     required
                   />
                 </div>
@@ -1964,7 +1964,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                     value={q4}
                     onChange={(e) => setQ4(e.target.value)}
                     placeholder="e.g., Yes, secure login for credentials and credit card payments via Stripe."
-                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs md:text-sm font-medium"
+                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-base md:text-sm font-medium"
                     required
                   />
                 </div>
@@ -2012,7 +2012,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                     value={q5}
                     onChange={(e) => setQ5(e.target.value)}
                     placeholder="e.g., Launch in 6 weeks, budget around $12,000"
-                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs md:text-sm font-medium"
+                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-base md:text-sm font-medium"
                     required
                   />
                 </div>
@@ -2280,7 +2280,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                               value={item.notes}
                               onChange={(e) => updateItemNotes(milestoneIdx, itemIdx, e.target.value)}
                               placeholder={t.milestonesAddNotePlaceholder}
-                              className="w-full px-3 py-2 text-xs font-semibold rounded-lg border-2 border-gray-300 focus:border-[#4ECDC4] bg-white text-gray-700"
+                              className="w-full px-3 py-2 text-base md:text-sm font-semibold rounded-lg border-2 border-gray-300 focus:border-[#4ECDC4] bg-white text-gray-700"
                             />
                           </div>
 
@@ -2357,7 +2357,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                     value={translatorText}
                     onChange={(e) => setTranslatorText(e.target.value)}
                     placeholder={t.transInputPlaceholder}
-                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs md:text-sm font-medium"
+                    className="w-full p-3 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-base md:text-sm font-medium"
                     required
                   />
                 </div>
@@ -2812,7 +2812,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                         value={helpQuestion}
                         onChange={(e) => setHelpQuestion(e.target.value)}
                         placeholder="e.g. What is QA testing? Why does it take so long? Or ask in your language!"
-                        className="w-full h-28 p-3 rounded-2xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs font-semibold resize-none bg-[#FFFDFB]"
+                        className="w-full h-28 p-3 rounded-2xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-base md:text-sm font-semibold resize-none bg-[#FFFDFB]"
                       />
                     </div>
 
@@ -3205,7 +3205,7 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
                         value={sandboxPitch}
                         onChange={(e) => setSandboxPitch(e.target.value)}
                         placeholder="e.g. We need to implement a Redis in-memory cache layer for our user profiles so that we avoid hitting the database on every HTTP request and reduce server latency."
-                        className="w-full h-36 p-3 rounded-2xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs font-semibold resize-none bg-[#FFFDFB]"
+                        className="w-full h-36 p-3 rounded-2xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-base md:text-sm font-semibold resize-none bg-[#FFFDFB]"
                       />
                     </div>
 
