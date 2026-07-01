@@ -28,7 +28,8 @@ import {
   Palette,
   Code,
   Mic,
-  MicOff
+  MicOff,
+  Target
 } from "lucide-react";
 
 import { 
@@ -292,7 +293,14 @@ const DEFAULT_MILESTONES: Milestone[] = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"prompts" | "questionnaire" | "milestones" | "translator" | "flutter" | "help">("prompts");
+  const [activeTab, setActiveTab] = useState<"prompts" | "questionnaire" | "milestones" | "translator" | "flutter" | "help" | "sandbox">("prompts");
+
+  // Pitch Simulator / Sandbox state
+  const [sandboxPersona, setSandboxPersona] = useState("Skeptical & Budget-Focused");
+  const [sandboxPitch, setSandboxPitch] = useState("");
+  const [sandboxLoading, setSandboxLoading] = useState(false);
+  const [sandboxResult, setSandboxResult] = useState<any | null>(null);
+  const [sandboxError, setSandboxError] = useState("");
 
   // Global Interface Language state
   const [appLanguage, setAppLanguage] = useState<SupportedLanguage>(() => {
@@ -1249,6 +1257,126 @@ Provide a clear explanation and real-life analogy, define any tricky words, and 
     }
   };
 
+  const handleSandboxSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sandboxPitch.trim()) return;
+
+    setSandboxLoading(true);
+    setSandboxError("");
+    setSandboxResult(null);
+    playBeep(349.23, "triangle", 0.08); // F4
+
+    try {
+      const apiKey = await getApiKey();
+
+      const systemInstruction = `You are a friendly, communication-focused Agile Software Architect Coach who helps software developers and business owners translate their technical speak into clear, jargon-free explanations for non-technical business clients.
+Your goal is to evaluate a developer's pitch/explanation, score its clarity for a specific client persona, identify confusing technical jargon, and provide a client-friendly rewrite with an everyday analogy.
+
+The Client Personas are:
+1. "Skeptical & Budget-Focused": Wants to know why a feature is necessary, how it affects cost/timeline, and if there is a cheaper way.
+2. "Anxious & Detail-Oriented": Worries about security, data loss, app crashes, and offline usability.
+3. "Non-Tech Visionary": Cares about user experience, branding, speed, and clean looks; easily gets lost in database tables or server jargon.
+
+Evaluate the provided pitch against the selected persona and output a JSON response containing:
+- score: An integer from 0 to 100 indicating how clear and jargon-free the explanation is.
+- reaction: How the client will react (a 2-3 sentence description of their likely thoughts/fears/satisfaction).
+- status: "success" (if score >= 80), "warning" (if score between 50-79), or "danger" (if score < 50).
+- jargonFound: An array of objects, each containing:
+  * term: The technical jargon term found.
+  * explanation: Why it's confusing to this client.
+  * alternative: A simple, non-tech alternative word or phrase.
+- rewrite: A beautiful, clear, client-friendly explanation of the concept, including a simple daily analogy.
+- tips: 2 or 3 short, actionable suggestions for the developer to communicate this specific concept better.`;
+
+      const promptText = `Evaluate this pitch for a "${sandboxPersona}" client:
+"${sandboxPitch}"`;
+
+      const apiBody = {
+        contents: [
+          {
+            parts: [
+              {
+                text: promptText
+              }
+            ]
+          }
+        ],
+        systemInstruction: {
+          parts: [
+            {
+              text: systemInstruction
+            }
+          ]
+        },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              score: { type: "integer", description: "Clarity score from 0 to 100." },
+              reaction: { type: "string", description: "The client's reaction and mindset." },
+              status: { type: "string", enum: ["success", "warning", "danger"], description: "success if score >= 80, warning if 50-79, danger if < 50." },
+              jargonFound: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    term: { type: "string", description: "The technical term." },
+                    explanation: { type: "string", description: "Why it is confusing." },
+                    alternative: { type: "string", description: "A simpler alternative word or phrase." }
+                  },
+                  required: ["term", "explanation", "alternative"]
+                }
+              },
+              rewrite: { type: "string", description: "Layman-friendly rewritten explanation with a simple analogy." },
+              tips: {
+                type: "array",
+                items: { type: "string" },
+                description: "2-3 quick communication tips."
+              }
+            },
+            required: ["score", "reaction", "status", "jargonFound", "rewrite", "tips"]
+          }
+        }
+      };
+
+      const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(apiBody)
+      });
+
+      if (!apiRes.ok) {
+        let errorMsg = "The Gemini API returned an error.";
+        try {
+          const errData = await apiRes.json();
+          if (errData && errData.error && errData.error.message) {
+            errorMsg = errData.error.message;
+          }
+        } catch (_) {}
+        throw new Error(errorMsg);
+      }
+
+      const resData = await apiRes.json();
+      const textResult = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!textResult) {
+        throw new Error("Empty response received from Gemini.");
+      }
+
+      const parsedData = JSON.parse(textResult.trim());
+      setSandboxResult(parsedData);
+      playBeep(587.33, "sine", 0.15); // D5 success
+    } catch (err: any) {
+      console.error(err);
+      setSandboxError(err.message || "Something went wrong while connecting to the Gemini API. Please try again.");
+      playBeep(220, "sawtooth", 0.3); // Error buzz
+    } finally {
+      setSandboxLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FFF9F2] text-[#2D2D2D] font-sans overflow-x-hidden flex flex-col selection:bg-[#FFD93D] selection:text-[#1A1A1A]">
       
@@ -1304,7 +1432,8 @@ Provide a clear explanation and real-life analogy, define any tricky words, and 
               { id: "milestones", label: t.navChecklist, color: "hover:bg-[#A0D2EB]" },
               { id: "translator", label: t.navTranslator, color: "hover:bg-[#FF6B6B] hover:text-white" },
               { id: "flutter", label: t.navFlutter, color: "hover:bg-[#FFE66D]" },
-              { id: "help", label: t.navHelp || "❓ SDLC Founder Help", color: "hover:bg-[#A0D2EB]" }
+              { id: "help", label: t.navHelp || "❓ SDLC Founder Help", color: "hover:bg-[#A0D2EB]" },
+              { id: "sandbox", label: "💬 Pitch Sandbox", color: "hover:bg-green-400 hover:text-white" }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -2924,6 +3053,261 @@ Provide a clear explanation and real-life analogy, define any tricky words, and 
           </div>
         )}
 
+        {activeTab === "sandbox" && (
+          <div className="flex flex-col gap-6 animate-fadeIn">
+            
+            {/* Top Banner */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(45,52,54,1)] border-4 border-[#2D3436] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-green-200/20 rounded-full blur-2xl -mr-6 -mt-6"></div>
+              <span className="inline-block px-3 py-1 bg-green-200 text-[#2D2D2D] rounded-full text-xs font-bold mb-3 border border-[#2D3436] tracking-wide">
+                🤖 PITCH SIMULATOR
+              </span>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1A1A] mb-3 flex items-center gap-2">
+                <Target className="w-7 h-7 text-green-600" />
+                Mock Client Pitch & Explainer Sandbox
+              </h2>
+              <p className="text-gray-700 text-sm md:text-base leading-relaxed">
+                Practice explaining complex technical features, timelines, or estimates to non-technical business clients. Select a target client persona, write your explanation, and our AI Coach will evaluate how clear and jargon-free your pitch is. It will score your communication, predict client reactions, point out confusing jargon, and provide a client-friendly rewrite.
+              </p>
+            </div>
+
+            {/* Layout Split */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              
+              {/* Left Column: Form Card */}
+              <div className="lg:col-span-5 flex flex-col gap-6">
+                
+                <div className="bg-white p-5 md:p-6 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] flex flex-col gap-4">
+                  <h3 className="text-sm font-extrabold text-[#1A1A1A] border-b-2 border-gray-100 pb-2">
+                    🎯 Practice Pitch
+                  </h3>
+                  
+                  <form onSubmit={handleSandboxSubmit} className="flex flex-col gap-4">
+                    <div>
+                      <label className="block text-xs font-extrabold text-gray-500 uppercase tracking-widest mb-1.5">
+                        Target Client Persona
+                      </label>
+                      <select
+                        value={sandboxPersona}
+                        onChange={(e) => {
+                          setSandboxPersona(e.target.value);
+                          playBeep(440, "sine", 0.05);
+                        }}
+                        className="w-full p-2.5 rounded-xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs font-bold bg-white"
+                      >
+                        <option value="Skeptical & Budget-Focused">💵 Skeptical & Budget-Focused (Cares about Cost/Timeline)</option>
+                        <option value="Anxious & Detail-Oriented">🔒 Anxious & Detail-Oriented (Cares about Security/Crashes)</option>
+                        <option value="Non-Tech Visionary">🎨 Non-Tech Visionary (Cares about UI/UX/Branding)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-extrabold text-gray-500 uppercase tracking-widest mb-1.5">
+                        Your Technical Explanation or Pitch
+                      </label>
+                      <textarea
+                        value={sandboxPitch}
+                        onChange={(e) => setSandboxPitch(e.target.value)}
+                        placeholder="e.g. We need to implement a Redis in-memory cache layer for our user profiles so that we avoid hitting the database on every HTTP request and reduce server latency."
+                        className="w-full h-36 p-3 rounded-2xl border-2 border-gray-300 focus:border-[#4ECDC4] focus:outline-none text-xs font-semibold resize-none bg-[#FFFDFB]"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={sandboxLoading || !sandboxPitch.trim()}
+                      className="w-full py-3 bg-[#FFD93D] hover:bg-[#FFE66D] disabled:opacity-50 text-xs md:text-sm font-extrabold rounded-2xl border-4 border-[#2D3436] shadow-[3px_3px_0px_0px_rgba(45,52,54,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(45,52,54,1)] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {sandboxLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Evaluating explainer...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 text-orange-600 animate-pulse" />
+                          <span>Evaluate Explainer! 🤖</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Preset Suggestions */}
+                <div className="bg-white p-5 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] flex flex-col gap-3">
+                  <h4 className="text-xs font-extrabold text-[#1A1A1A] uppercase tracking-wider">
+                    💡 Common Explainer Scenarios:
+                  </h4>
+                  <div className="flex flex-col gap-2">
+                    {[
+                      {
+                        title: "1. Why build custom auth instead of third-party login?",
+                        text: "We need custom authentication flow with JSON Web Tokens and refresh tokens stored in HTTP-only cookies to verify sessions instead of OAuth login, so that we have complete control over user schemas."
+                      },
+                      {
+                        title: "2. Why database indexing is needed for speed",
+                        text: "We must run database migrations to add composite indexes on the orders table for user_id and purchase_date fields, otherwise search queries will execute full-table scans causing server timeouts."
+                      },
+                      {
+                        title: "3. What is API rate limiting and why add it",
+                        text: "We are configuring a Redis rate-limiter middleware limiting clients to 60 requests per minute to prevent Denial of Service and scraping attacks on our API endpoints."
+                      }
+                    ].map((item, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setSandboxPitch(item.text);
+                          playBeep(523, "sine", 0.05);
+                        }}
+                        className="text-left p-2.5 rounded-xl border border-gray-200 hover:border-green-400 hover:bg-green-50 transition-all text-[11px] font-bold text-gray-700 bg-gray-50/50"
+                      >
+                        {item.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Evaluation Results */}
+              <div className="lg:col-span-7">
+                {sandboxLoading && (
+                  <div className="bg-white p-12 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] flex flex-col items-center justify-center gap-4 text-center">
+                    <Loader2 className="w-10 h-10 text-green-600 animate-spin" />
+                    <div>
+                      <h4 className="text-sm font-extrabold text-[#1A1A1A] mb-1">AI Coach is reviewing your pitch...</h4>
+                      <p className="text-xs text-gray-500">Checking for jargon, clarity, and target persona comprehension.</p>
+                    </div>
+                  </div>
+                )}
+
+                {sandboxError && (
+                  <div className="bg-red-50 p-6 rounded-3xl border-4 border-red-500 shadow-[4px_4px_0px_0px_rgba(239,68,68,1)] text-red-700 flex flex-col gap-2">
+                    <h4 className="text-sm font-extrabold flex items-center gap-1.5">
+                      <span>⚠️</span> Evaluation Failed
+                    </h4>
+                    <p className="text-xs font-semibold leading-relaxed">{sandboxError}</p>
+                  </div>
+                )}
+
+                {!sandboxLoading && !sandboxResult && !sandboxError && (
+                  <div className="bg-white p-12 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] text-center text-gray-400 flex flex-col items-center justify-center gap-3">
+                    <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center border-2 border-dashed border-green-300">
+                      <Target className="w-8 h-8 text-green-500" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-extrabold text-[#1A1A1A] mb-1">Sandbox Awaiting Explainer</h4>
+                      <p className="text-xs text-gray-500 max-w-sm">Write an explanation on the left and submit it to see how your client will react and how to refine it!</p>
+                    </div>
+                  </div>
+                )}
+
+                {sandboxResult && (
+                  <div className="flex flex-col gap-6 animate-fadeIn">
+                    
+                    {/* Score and Reaction Summary */}
+                    <div className="bg-white p-6 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] flex flex-col md:flex-row gap-6 items-center">
+                      
+                      {/* Big Brutalist Score Badge */}
+                      <div className={`w-24 h-24 rounded-full border-4 border-[#2D3436] flex flex-col items-center justify-center shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] shrink-0 ${
+                        sandboxResult.status === "success" ? "bg-[#4ECDC4]" : 
+                        sandboxResult.status === "warning" ? "bg-[#FFD93D]" : "bg-[#FF6B6B]"
+                      }`}>
+                        <span className="text-2xl font-black text-[#1A1A1A]">{sandboxResult.score}</span>
+                        <span className="text-[9px] font-black text-[#1A1A1A] uppercase tracking-wider">CLARITY</span>
+                      </div>
+
+                      {/* Mindset / Reaction explanation */}
+                      <div className="flex-1 flex flex-col gap-1.5">
+                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                          👤 Client Persona Mindset / Reaction:
+                        </h4>
+                        <p className="text-xs font-bold text-gray-700 leading-relaxed italic">
+                          "{sandboxResult.reaction}"
+                        </p>
+                      </div>
+
+                    </div>
+
+                    {/* Jargon Found section */}
+                    {sandboxResult.jargonFound && sandboxResult.jargonFound.length > 0 && (
+                      <div className="bg-white p-5 md:p-6 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] flex flex-col gap-3">
+                        <h4 className="text-xs font-black text-[#FF6B6B] uppercase tracking-widest flex items-center gap-1.5">
+                          <span>🔍</span> Confusing Jargon Identified:
+                        </h4>
+                        <div className="flex flex-col gap-3">
+                          {sandboxResult.jargonFound.map((jargon: any, i: number) => (
+                            <div key={i} className="p-3 bg-red-50 rounded-2xl border-2 border-red-200 flex flex-col gap-1">
+                              <span className="text-xs font-black text-red-600 uppercase tracking-wider">{jargon.term}</span>
+                              <p className="text-[11px] text-gray-600 font-semibold">{jargon.explanation}</p>
+                              <div className="text-[11px] font-bold text-gray-800 mt-1 flex items-center gap-1">
+                                <span className="text-green-600">💡 Simpler wording:</span>
+                                <span>"{jargon.alternative}"</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Rewritten Explanation with Analogy */}
+                    <div className="bg-[#4ECDC4]/10 p-5 md:p-6 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] relative overflow-hidden flex flex-col gap-3">
+                      <span className="absolute top-0 right-0 bg-[#4ECDC4] text-white font-extrabold text-[9px] px-3 py-1 rounded-bl-xl border-l-2 border-b-2 border-[#2D3436] uppercase tracking-wider">
+                        Client-Friendly Version
+                      </span>
+                      
+                      <h4 className="text-xs font-black text-[#1A1A1A] uppercase tracking-widest flex items-center gap-1.5">
+                        <span>✨</span> Recommended Rewrite:
+                      </h4>
+
+                      <p className="text-xs font-bold text-gray-800 leading-relaxed bg-white/70 p-4 rounded-2xl border-2 border-dashed border-[#4ECDC4] shadow-sm">
+                        {sandboxResult.rewrite}
+                      </p>
+
+                      <button
+                        onClick={() => handleCopy(sandboxResult.rewrite, "copy-sandbox-rewrite")}
+                        className="w-full py-2 bg-white hover:bg-green-100 text-xs font-extrabold rounded-xl border-2 border-[#2D3436] flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                      >
+                        {copiedText === "copy-sandbox-rewrite" ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-green-500" strokeWidth={2.5} />
+                            <span>Rewrite Copied to Clipboard!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-gray-500" />
+                            <span>Copy Rewrite to Clipboard</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Actionable Tips */}
+                    {sandboxResult.tips && sandboxResult.tips.length > 0 && (
+                      <div className="bg-white p-5 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)] flex flex-col gap-3">
+                        <h4 className="text-xs font-black text-[#1A1A1A] uppercase tracking-widest">
+                          💬 Communication Tips:
+                        </h4>
+                        <ul className="flex flex-col gap-2">
+                          {sandboxResult.tips.map((tip: string, i: number) => (
+                            <li key={i} className="flex gap-2 items-start text-xs font-semibold text-gray-700">
+                              <span className="text-green-600 shrink-0">✔</span>
+                              <span>{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
       </main>
 
       {/* Footer block */}
@@ -2938,6 +3322,8 @@ Provide a clear explanation and real-life analogy, define any tricky words, and 
             <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("milestones"); playBeep(523, "sine", 0.05); }}>3. Checklist</span>
             <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("translator"); playBeep(523, "sine", 0.05); }}>4. Translator</span>
             <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("flutter"); playBeep(523, "sine", 0.05); }}>5. Flutter Transition</span>
+            <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("help"); playBeep(523, "sine", 0.05); }}>6. Help Desk</span>
+            <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("sandbox"); playBeep(523, "sine", 0.05); }}>7. Pitch Sandbox</span>
           </div>
         </div>
       </footer>
