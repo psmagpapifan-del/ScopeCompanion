@@ -1,0 +1,6 @@
+{
+  "name": "Client Scoping Companion",
+  "description": "An interactive scoping and onboarding companion for software business owners to kickstart client discussions, run questionnaires, and simplify complex development processes for layman or non-native English speaking founders.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
