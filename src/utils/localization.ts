@@ -8,7 +8,6 @@ export interface Translations {
   navQuestionnaire: string;
   navChecklist: string;
   navTranslator: string;
-  navFlutter: string;
   navHelp?: string;
   
   // Tab 1: Prompts
@@ -83,22 +82,6 @@ export interface Translations {
   transOutputCopiedBtn: string;
 
   // Tab 5: Flutter Bridge
-  flutterBannerTag: string;
-  flutterBannerSub: string;
-  flutterBannerTitle: string;
-  flutterBannerDesc: string;
-  flutterSelectModule: string;
-  flutterChecklistTitle: string;
-  flutterChecklist1Title: string;
-  flutterChecklist1Desc: string;
-  flutterChecklist2Title: string;
-  flutterChecklist2Desc: string;
-  flutterChecklist3Title: string;
-  flutterChecklist3Desc: string;
-  flutterChecklist4Title: string;
-  flutterChecklist4Desc: string;
-  flutterCopyLibrary: string;
-  flutterCopiedLibrary: string;
 
   // Global UI Interface selector
   interfaceLanguageSelector: string;
@@ -114,7 +97,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 Questionnaire & Brief",
     navChecklist: "📋 Alignment Checklist",
     navTranslator: "🌎 Layman Translator",
-    navFlutter: "📱 Flutter & Stitch Dev",
     navHelp: "❓ SDLC Founder Help",
     
     promptsBannerTag: "🗣️ MEETING LAUNCHER",
@@ -184,22 +166,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "Copy Explainer text for client chat",
     transOutputCopiedBtn: "Explainer Copied!",
 
-    flutterBannerTag: "📱 TRANSITION HUB",
-    flutterBannerSub: "Antigravity & Stitch",
-    flutterBannerTitle: "Flutter & Stitch Mobile Bridge",
-    flutterBannerDesc: "Exporting your layouts to Antigravity and building high-fidelity native apps with Flutter has never been easier. Below are fully generated Dart libraries, data objects, styling guides, and HTTP network protocols mapped exactly to this companion app's business rules and design system!",
-    flutterSelectModule: "📁 Select Export Module:",
-    flutterChecklistTitle: "Stitch & Flutter Checklist",
-    flutterChecklist1Title: "Stitch Border-Shadows:",
-    flutterChecklist1Desc: "Use the provided neoBrutalistDecoration method in Flutter to recreate the retro flat shadow look cleanly on mobile.",
-    flutterChecklist2Title: "Local Storage Persistence:",
-    flutterChecklist2Desc: "Map our browser localStorage logic directly to Flutter's shared_preferences or Hive database to persist milestone checklists.",
-    flutterChecklist3Title: "Sound Effect Synths:",
-    flutterChecklist3Desc: "Use the soundpool Flutter plugin to play low-latency beep tones matching our Web Audio API synthetic triggers.",
-    flutterChecklist4Title: "API Network Endpoint:",
-    flutterChecklist4Desc: "Host our Express server on Cloud Run or a dedicated URL, configure CORS, and let the Flutter app consume the translated explanations.",
-    flutterCopyLibrary: "Copy Full Library",
-    flutterCopiedLibrary: "Dart Code Copied!",
 
     interfaceLanguageSelector: "🌎 Global App Language:",
     footerRights: "Client Scoping Companion • Crafted in the Vibrant Palette layout for Software Builders."
@@ -212,7 +178,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 Cuestionario y Resumen",
     navChecklist: "📋 Lista de Alineación",
     navTranslator: "🌎 Traductor Simple",
-    navFlutter: "📱 Desarrollo Flutter y Stitch",
     
     promptsBannerTag: "🗣️ LANZADOR DE REUNIONES",
     promptsBannerTitle: "Iniciadores de Discusión con Clientes",
@@ -281,22 +246,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "Copiar texto explicativo para chat con el cliente",
     transOutputCopiedBtn: "¡Explicación Copiada!",
 
-    flutterBannerTag: "📱 CENTRO DE TRANSICIÓN",
-    flutterBannerSub: "Antigravity y Stitch",
-    flutterBannerTitle: "Puente Móvil Flutter y Stitch",
-    flutterBannerDesc: "Exportar sus diseños a Antigravity y crear aplicaciones nativas de alta fidelidad con Flutter nunca ha sido tan fácil. ¡A continuación se presentan librerías en Dart, objetos de datos, guías de estilo y protocolos de red HTTP generados exactamente con las reglas de negocio y diseño de esta aplicación!",
-    flutterSelectModule: "📁 Seleccionar Módulo de Exportación:",
-    flutterChecklistTitle: "Lista de Verificación Stitch y Flutter",
-    flutterChecklist1Title: "Bordes y Sombras Stitch:",
-    flutterChecklist1Desc: "Use el método neoBrutalistDecoration provisto en Flutter para recrear el look retro de sombras planas de manera limpia en móviles.",
-    flutterChecklist2Title: "Persistencia de Almacenamiento Local:",
-    flutterChecklist2Desc: "Asocie nuestra lógica de localStorage directamente a shared_preferences o base de datos Hive en Flutter para guardar el progreso.",
-    flutterChecklist3Title: "Efectos de Sonido Sintéticos:",
-    flutterChecklist3Desc: "Use el plugin soundpool de Flutter para reproducir los pitidos con baja latencia, imitando la API de audio web.",
-    flutterChecklist4Title: "Endpoint de Red API:",
-    flutterChecklist4Desc: "Aloje nuestro servidor Express en Cloud Run o una URL dedicada, configure CORS, y consuma las explicaciones traducidas desde Flutter.",
-    flutterCopyLibrary: "Copiar Librería Completa",
-    flutterCopiedLibrary: "¡Código de Dart Copiado!",
 
     interfaceLanguageSelector: "🌎 Idioma Global de la App:",
     footerRights: "Compañero de Alcance del Cliente • Creado con el diseño de Paleta Vibrante para Desarrolladores."
@@ -309,7 +258,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 问卷与项目简报",
     navChecklist: "📋 进度对齐清单",
     navTranslator: "🌎 技术术语翻译器",
-    navFlutter: "📱 Flutter & Stitch 迁移",
     
     promptsBannerTag: "🗣️ 会议启动器",
     promptsBannerTitle: "客户沟通引导话术",
@@ -378,22 +326,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "复制此通俗解析（方便发给客户讨论）",
     transOutputCopiedBtn: "解析内容已成功复制！",
 
-    flutterBannerTag: "📱 移动端迁移枢纽",
-    flutterBannerSub: "Antigravity & Stitch 设计",
-    flutterBannerTitle: "Flutter & Stitch 移动端一键迁移",
-    flutterBannerDesc: "将您的项目原型导出至 Antigravity 平台，并使用 Flutter 和 Stitch 设计指南构建高保真原生应用。下方已经为您完全准备好了符合本应用业务逻辑与设计系统规范的 Dart 实体类、数据定义、Stitch 主题样式及网络 API 通讯协议！",
-    flutterSelectModule: "📁 选择导出的代码模块：",
-    flutterChecklistTitle: "Stitch & Flutter 落地清单",
-    flutterChecklist1Title: "Stitch 粗黑边框阴影效果:",
-    flutterChecklist1Desc: "在 Flutter 中使用我们为您准备的 neoBrutalistDecoration 装饰器方法，即可在手机屏幕上完美还原标志性的扁平复古厚重阴影质感。",
-    flutterChecklist2Title: "本地存储持久化实现:",
-    flutterChecklist2Desc: "将网页端 localStorage 本地笔记逻辑映射至 Flutter 的 shared_preferences 或 Hive 轻量级数据库，确保离线清单进度不丢失。",
-    flutterChecklist3Title: "点击微交互音效合成:",
-    flutterChecklist3Desc: "在 Flutter 中集成 soundpool 插件，播放低延迟的合成蜂鸣器音效，完美还原 Web Audio API 的感官反馈。",
-    flutterChecklist4Title: "API 服务部署与请求对接:",
-    flutterChecklist4Desc: "将我们的 Express 后台服务部署在 Cloud Run 上，开启 CORS 跨域权限，便可让移动客户端流畅发起翻译及术语精炼请求。",
-    flutterCopyLibrary: "一键复制完整代码库",
-    flutterCopiedLibrary: "Dart 代码复制成功！",
 
     interfaceLanguageSelector: "🌎 全局界面语言:",
     footerRights: "客户项目规划助手 • 采用适合软件出海团队的 Vibrants 扁平拟物风格精心设计。"
@@ -406,7 +338,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 Questionnaire & Brief",
     navChecklist: "📋 Liste d'Alignement",
     navTranslator: "🌎 Traducteur Layman",
-    navFlutter: "📱 Flutter & Stitch Dev",
     
     promptsBannerTag: "🗣️ LANCEUR DE RÉUNION",
     promptsBannerTitle: "Questions de Discussion Clientes",
@@ -475,22 +406,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "Copier l'explication pour l'envoyer au client",
     transOutputCopiedBtn: "Explication Copiée !",
 
-    flutterBannerTag: "📱 ENTRAIDE DE TRANSITION",
-    flutterBannerSub: "Antigravity & Stitch",
-    flutterBannerTitle: "Passerelle Mobile Flutter & Stitch",
-    flutterBannerDesc: "Exporter vos maquettes vers Antigravity et créer des applications mobiles natives de haute fidélité avec Flutter n'a jamais été aussi simple. Retrouvez ci-dessous des librairies en Dart, des objets de données, des guides de style et des protocoles de réseau HTTP générés exactement selon les spécifications de cette application !",
-    flutterSelectModule: "📁 Sélectionner le Module à Exporter :",
-    flutterChecklistTitle: "Liste de Contrôle Stitch & Flutter",
-    flutterChecklist1Title: "Bordures et Ombres Stitch :",
-    flutterChecklist1Desc: "Utilisez la méthode neoBrutalistDecoration fournie en Flutter pour recréer l'aspect rétro d'ombres plates proprement sur mobile.",
-    flutterChecklist2Title: "Persistance de Stockage Local :",
-    flutterChecklist2Desc: "Associez notre logique de localStorage directement à shared_preferences ou base de données Hive en Flutter pour conserver la progression.",
-    flutterChecklist3Title: "Effets Sonores Synthétiques :",
-    flutterChecklist3Desc: "Utilisez le plugin soundpool de Flutter pour jouer des tonalités de bip à faible latence, imitant l'API Web Audio.",
-    flutterChecklist4Title: "Endpoint Réseau de l'API :",
-    flutterChecklist4Desc: "Hébergez notre serveur Express sur Cloud Run ou une URL dédiée, configurez le CORS, et laissez l'application Flutter consommer les explications simplifiées.",
-    flutterCopyLibrary: "Copier la Librairie Complète",
-    flutterCopiedLibrary: "Code Dart Copié !",
 
     interfaceLanguageSelector: "🌎 Langue Globale de l'App :",
     footerRights: "Compagnon de Cadrage Client • Conçu dans la charte graphique de la Palette Vibrante pour Développeurs."
@@ -503,7 +418,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 簡易要件問診票",
     navChecklist: "📋 要件合意チェックリスト",
     navTranslator: "🌎 やさしいIT翻訳器",
-    navFlutter: "📱 Flutter & Stitch 移行",
     
     promptsBannerTag: "🗣️ 会議起動ツール",
     promptsBannerTitle: "クライアント議論の呼び水質問カード",
@@ -572,22 +486,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "この解説をコピーする（チャット等での説明に便利です）",
     transOutputCopiedBtn: "解説をコピーしました！",
 
-    flutterBannerTag: "📱 モバイル移行ハブ",
-    flutterBannerSub: "Antigravity & Stitch デザイン",
-    flutterBannerTitle: "Flutter & Stitch モバイル版への移行ブリッジ",
-    flutterBannerDesc: "プロトタイプをモバイル実機向けに Antigravity 開発プラットフォームへとエクスポートし、FlutterとStitchのデザイン仕様を用いて美しいネイティブアプリへと落とし込むのは非常にスムーズです。本アプリのビジネスルール、データ構造、テーマ設計に対応するDartクラスやAPI通信コードが完全に用意されています！",
-    flutterSelectModule: "📁 エクスポートするコードモジュールを選択：",
-    flutterChecklistTitle: "Stitch & Flutter 開発チェックリスト",
-    flutterChecklist1Title: "Stitch 側の太いボーダー影効果:",
-    flutterChecklist1Desc: "Flutter内に用意された <code>neoBrutalistDecoration</code> デコレーション関数を使うことで、特徴的なレトロ・ネオブルータリズム調の厚みある平らな影をモバイル画面でそのまま再現できます。",
-    flutterChecklist2Title: "ローカル状態管理・永続化:",
-    flutterChecklist2Desc: "ブラウザ側の localStorage でのメモ保存ロジックを、Flutter標準の <code>shared_preferences</code> や <code>Hive</code> データベースにそのままマッピングしてマイルストーンを永続化します。",
-    flutterChecklist3Title: "マイクロインタラクション音響効果:",
-    flutterChecklist3Desc: "Flutterで <code>soundpool</code> ライブラリを使用することで、ブラウザ標準の Web Audio API シンセサイザーと同様の低遅延な電子音フィードバックをモバイルで再現できます。",
-    flutterChecklist4Title: "API 連携エンドポイントの設置:",
-    flutterChecklist4Desc: "当Expressバックエンドを Cloud Run 等にホスティングし、CORS通信を許可。Flutterアプリから直接IT用語翻訳/解説APIを投げられるようにします。",
-    flutterCopyLibrary: "コードライブラリをコピーする",
-    flutterCopiedLibrary: "Dartコードをコピーしました！",
 
     interfaceLanguageSelector: "🌎 アプリ表示言語:",
     footerRights: "顧客スコープ策定アシスタント • クリエイター向けの鮮やかな「Vibrant Palette」フラットUIデザインで構築。"
@@ -600,7 +498,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 Questionário e Resumo",
     navChecklist: "📋 Lista de Alinhamento",
     navTranslator: "🌎 Tradutor Layman",
-    navFlutter: "📱 Desenvolvimento Flutter & Stitch",
     
     promptsBannerTag: "🗣️ INICIADOR DE REUNIÃO",
     promptsBannerTitle: "Iniciadores de Discussão com Clientes",
@@ -669,22 +566,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "Copiar texto de explicação para enviar ao cliente",
     transOutputCopiedBtn: "Explicação Copiada!",
 
-    flutterBannerTag: "📱 HUB DE TRANSIÇÃO",
-    flutterBannerSub: "Antigravity e Stitch",
-    flutterBannerTitle: "Ponte Móvel Flutter e Stitch",
-    flutterBannerDesc: "Exportar seus protótipos para a plataforma Antigravity e criar aplicativos nativos de alta fidelidade com Flutter e Stitch nunca foi tão simples. Encontre abaixo as bibliotecas em Dart, objetos de dados, guias de estilo e protocolos de rede HTTP gerados de acordo com os requisitos desta aplicação!",
-    flutterSelectModule: "📁 Selecionar Módulo de Exportação:",
-    flutterChecklistTitle: "Lista de Verificação Stitch & Flutter",
-    flutterChecklist1Title: "Bordas e Sombras Stitch:",
-    flutterChecklist1Desc: "Use o método neoBrutalistDecoration fornecido em Flutter para recriar o visual retro de sombras chapadas perfeitamente no celular.",
-    flutterChecklist2Title: "Persistência no Armazenamento Local:",
-    flutterChecklist2Desc: "Associe nossa lógica de localStorage diretamente a shared_preferences ou banco de dados Hive em Flutter para preservar o progresso.",
-    flutterChecklist3Title: "Efeitos Sonoros Sintéticos:",
-    flutterChecklist3Desc: "Use o plugin soundpool do Flutter para reproduzir bipagens eletrônicas de baixa latência imitando a API Web Audio.",
-    flutterChecklist4Title: "Endpoint de Rede API:",
-    flutterChecklist4Desc: "Aloje nosso servidor Express no Cloud Run ou uma URL dedicada, configure o CORS e consuma as explicações simplificadas do Flutter.",
-    flutterCopyLibrary: "Copiar Biblioteca Completa",
-    flutterCopiedLibrary: "Código Dart Copiado!",
 
     interfaceLanguageSelector: "🌎 Idioma Global do App:",
     footerRights: "Companion de Escopo do Cliente • Desenvolvido sob a paleta vibrante para criadores de software."
@@ -697,7 +578,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 استبيان وموجز المشروع",
     navChecklist: "📋 قائمة التحقق والوفاق",
     navTranslator: "🌎 مترجم المصطلحات المبسط",
-    navFlutter: "📱 تطوير فلاتر وستيتش",
     
     promptsBannerTag: "🗣️ منطلق الاجتماعات",
     promptsBannerTitle: "مفاتيح بدء الحوار مع العملاء",
@@ -766,22 +646,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "نسخ الشرح المبسط لمشاركته مع العميل في المحادثة",
     transOutputCopiedBtn: "تم نسخ الشرح بنجاح!",
 
-    flutterBannerTag: "📱 بوابة التحول والانتقال",
-    flutterBannerSub: "منصة انتيغرافيتي وتصميم ستيتش",
-    flutterBannerTitle: "جسر التحول إلى فلاتر وستيتش للموبايل",
-    flutterBannerDesc: "تصدير تصاميمك إلى منصة انتيغرافيتي وبناء تطبيقات موبايل أصلية وعالية الأداء باستخدام فلاتر وتوجيهات ستيتش أصبح في غاية السهولة والمباشرة. بالأسفل مكتبات دارت كاملة التجهيز وقوالب البيانات وبروتوكولات الربط بالشبكة المتوافقة تماماً مع هذا التطبيق!",
-    flutterSelectModule: "📁 اختر وحدة الكود البرمجي المراد نسخها وتصديرها:",
-    flutterChecklistTitle: "قائمة التحقق لبناء المشروع بفلاتر وستيتش",
-    flutterChecklist1Title: "حدود وظلال لغة ستيتش المرئية:",
-    flutterChecklist1Desc: "استخدم دالة <code>neoBrutalistDecoration</code> الجاهزة بلغة دارت لإعادة بناء المظهر الكلاسيكي ذي الظلال العريضة والمسطحة على شاشات الهواتف بذكاء ودقة.",
-    flutterChecklist2Title: "حفظ البيانات والتقدم محلياً:",
-    flutterChecklist2Desc: "اربط منطق حفظ الملاحظات بـ localStorage لدينا بـ <code>shared_preferences</code> أو قاعدة بيانات Hive في فلاتر لضمان الحفظ الدائم.",
-    flutterChecklist3Title: "المؤثرات الصوتية والصفارات التفاعلية:",
-    flutterChecklist3Desc: "استخدم إضافة <code>soundpool</code> في فلاتر لتشغيل صفارات تفاعلية منخفضة التأخير تطابق المؤثرات الصوتية لدينا في متصفح الويب.",
-    flutterChecklist4Title: "توفير خوادم الربط والـ API:",
-    flutterChecklist4Desc: "استضف خادم Express الخاص بنا على منصة Cloud Run، وقم بتفعيل خيارات CORS، لكي يتصل تطبيق فلاتر بالمترجم الذكي وتأدية طلبات الشرح بنجاح.",
-    flutterCopyLibrary: "نسخ المكتبة البرمجية الكاملة",
-    flutterCopiedLibrary: "تم نسخ كود لغة دارت بنجاح!",
 
     interfaceLanguageSelector: "🌎 لغة الواجهة العامة:",
     footerRights: "رفيق تحديد نطاق المشروع • تم تصميمه بالاعتماد على تخطيط الباقة النابضة بالحياة لمطوري البرمجيات المحترفين."
@@ -794,7 +658,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 Khảo Sát & Tóm Tắt",
     navChecklist: "📋 Checklist Đồng Bộ",
     navTranslator: "🌎 Dịch Thuật Bình Dân",
-    navFlutter: "📱 Phát Triển Flutter & Stitch",
     
     promptsBannerTag: "🗣️ BAN PHÁT CUỘC HỌP",
     promptsBannerTitle: "Bộ Câu Hỏi Khởi Động Thảo Luận",
@@ -863,22 +726,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "Sao chép bản giải thích này (tiện trao đổi với khách hàng)",
     transOutputCopiedBtn: "Đã Sao Chép Bản Giải Thích!",
 
-    flutterBannerTag: "📱 CẦU NỐI CHUYỂN ĐỔI DI ĐỘNG",
-    flutterBannerSub: "Hệ Thống Antigravity & Stitch",
-    flutterBannerTitle: "Cầu Nối Di Động Flutter & Stitch",
-    flutterBannerDesc: "Xuất bản thiết kế sang nền tảng di động Antigravity và dựng ứng dụng chất lượng cao bằng Flutter & Stitch vô cùng dễ dàng. Ở bên dưới là thư viện Dart, mô hình dữ liệu, thiết lập phong cách Stitch và giao thức mạng HTTP được cấu trúc khớp hoàn toàn với dự án!",
-    flutterSelectModule: "📁 Chọn mô-đun mã nguồn muốn sao chép:",
-    flutterChecklistTitle: "Checklist Triển Khai Stitch & Flutter",
-    flutterChecklist1Title: "Viền và Bóng Đổ Phong Cách Stitch:",
-    flutterChecklist1Desc: "Sử dụng hàm trang trí <code>neoBrutalistDecoration</code> được lập trình sẵn bằng Dart để giữ nguyên vẹn thiết kế retro phẳng nổi bật lên màn hình di động.",
-    flutterChecklist2Title: "Lưu Trữ Dữ Liệu Bộ Nhớ Máy:",
-    flutterChecklist2Desc: "Ánh xạ cơ chế lưu ghi chú localStorage của web sang <code>shared_preferences</code> hoặc cơ sở dữ liệu nhẹ Hive trong Flutter để lưu trữ vĩnh viễn.",
-    flutterChecklist3Title: "Âm Thanh Mic Interactivity:",
-    flutterChecklist3Desc: "Tích hợp gói thư viện <code>soundpool</code> trong Flutter để phát âm thanh beep tương tác độ trễ cực thấp y hệt Web Audio API của web.",
-    flutterChecklist4Title: "Cổng Kết Nối Gọi Mạng API:",
-    flutterChecklist4Desc: "Triển khai backend Express của chúng ta lên Cloud Run, kích hoạt CORS để ứng dụng di động Flutter trực tiếp gửi lệnh dịch thuật và giải nghĩa thành công.",
-    flutterCopyLibrary: "Sao Chép Toàn Bộ Mã Nguồn",
-    flutterCopiedLibrary: "Mã nguồn Dart đã được sao chép thành công!",
 
     interfaceLanguageSelector: "🌎 Ngôn Ngữ Giao Diện:",
     footerRights: "Người Bạn Đồng Hành Lên Lịch Trình • Được hoàn thiện bằng phong cách thiết kế phẳng sinh động Vibrant Palette cho lập trình viên."
@@ -891,7 +738,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 Kwestyuner at Brief",
     navChecklist: "📋 Listahan ng Kasunduan",
     navTranslator: "🌎 Tagasalin para sa Layman",
-    navFlutter: "📱 Pagbuo sa Flutter at Stitch",
     
     promptsBannerTag: "🗣️ TAGAPAGSIMULA NG PAGPUPULONG",
     promptsBannerTitle: "Mga Gabay sa Talakayan kasama ang Kliyente",
@@ -960,22 +806,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "Kopyahin ang paliwanag para sa pakikipag-chat sa kliyente",
     transOutputCopiedBtn: "Kopya na ang Paliwanag!",
 
-    flutterBannerTag: "📱 HUB NG PAGBIBINAYO",
-    flutterBannerSub: "Antigravity at Stitch",
-    flutterBannerTitle: "Tulay ng Mobile sa Flutter at Stitch",
-    flutterBannerDesc: "Ang pag-export ng iyong mga disenyo sa platform ng Antigravity at paglikha ng mga de-kalidad na native mobile app gamit ang Flutter at Stitch ay napakadali. Makikita sa ibaba ang mga library sa Dart, data models, gabay sa estilo, at HTTP network protocols na tugma sa aplikasyong ito!",
-    flutterSelectModule: "📁 Pumili ng Module na I-e-export:",
-    flutterChecklistTitle: "Checklist sa Pagpapatupad ng Stitch at Flutter",
-    flutterChecklist1Title: "Mga Border at Shadow ng Stitch:",
-    flutterChecklist1Desc: "Gamitin ang ibinigay na pamamaraang neoBrutalistDecoration sa Flutter upang muling malikha ang retro na hitsura ng flat shadow nang malinis sa mobile.",
-    flutterChecklist2Title: "Persistencia sa Lokal na Imbakan:",
-    flutterChecklist2Desc: "I-map ang ating lohika ng localStorage ng web nang direkta sa shared_preferences o Hive database sa Flutter upang mapanatili ang progreso.",
-    flutterChecklist3Title: "Mga Sintetikong Sound Effect:",
-    flutterChecklist3Desc: "Gamitin ang soundpool plugin sa Flutter upang magpatugtog ng mga low-latency na beep na tumutugma sa Web Audio API synthesizer ng web.",
-    flutterChecklist4Title: "Endpoint ng Network ng API:",
-    flutterChecklist4Desc: "I-host ang ating Express server sa Cloud Run o isang dedikadong URL, i-configure ang CORS, at hayaan ang Flutter app na gamitin ang mga simpleng paliwanag.",
-    flutterCopyLibrary: "Kopyahin ang Buong Library",
-    flutterCopiedLibrary: "Kopya na ang Dart Code!",
 
     interfaceLanguageSelector: "🌎 Wikang Pandaigdig ng App:",
     footerRights: "Katuwang sa Pag-iskop ng Proyekto • Dinisenyo sa ilalim ng makulay na paleta para sa mga tagabuo ng software."
@@ -988,7 +818,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 स्कोपिंग प्रश्नावली एवं ब्रीफ",
     navChecklist: "📋 संरेखण चेकलिस्ट",
     navTranslator: "🌎 लेमैन तकनीकी अनुवादक",
-    navFlutter: "📱 फ़्लटर और स्टिच देव",
     
     promptsBannerTag: "🗣️ मीटिंग कनवर्टर",
     promptsBannerTitle: "ग्राहक चर्चा शुरू करने के प्रश्न कार्ड",
@@ -1057,22 +886,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "ग्राहक चर्चा के लिए इस स्पष्टीकरण को कॉपी करें",
     transOutputCopiedBtn: "स्पष्टीकरण सफलतापूर्वक कॉपी हो गया!",
 
-    flutterBannerTag: "📱 मोबाइल संक्रमण केंद्र",
-    flutterBannerSub: "एंटीग्रेविटी और स्टिच डिज़ाइन",
-    flutterBannerTitle: "फ़्लटर और स्टिच मोबाइल संक्रमण ब्रिज",
-    flutterBannerDesc: "अपने डिज़ाइनों को एंटीग्रेविटी प्लेटफ़ॉर्म पर निर्यात करना और फ़्लटर और स्टिच डिज़ाइन दिशानिर्देशों का उपयोग करके सुंदर मूल मोबाइल ऐप बनाना बेहद आसान है। इस एप्लिकेशन के नियमों, डेटा और शैली के अनुकूल पूरी तरह से तैयार डार्ट लाइब्रेरी कोड नीचे दिया गया है!",
-    flutterSelectModule: "📁 निर्यात करने के लिए कोड मॉड्यूल चुनें:",
-    flutterChecklistTitle: "स्टिच और फ़्लटर कार्यान्वयन चेकलिस्ट",
-    flutterChecklist1Title: "स्टिच बॉर्डर और शैडो प्रभाव:",
-    flutterChecklist1Desc: "मोबाइल स्क्रीन पर फ्लैट शैडो लुक को सहेजने के लिए डार्ट में तैयार किए गए <code>neoBrutalistDecoration</code> डेकोरेशन फ़ंक्शन का उपयोग करें।",
-    flutterChecklist2Title: "स्थानीय संग्रहण और प्रगति सहेजना:",
-    flutterChecklist2Desc: "प्रगति को सहेजने के लिए वेब के localStorage को फ़्लटर के <code>shared_preferences</code> या Hive डेटाबेस में मैप करें।",
-    flutterChecklist3Title: "इंटरएक्टिव ध्वनि प्रभाव:",
-    flutterChecklist3Desc: "फ़्लटर में <code>soundpool</code> पैकेज का उपयोग करें ताकि लो-लेटेंसी बीप ध्वनि प्रतिक्रियाएं वेब ऑडियो एपीआई की तरह मोबाइल में चल सकें।",
-    flutterChecklist4Title: "एपीआई नेटवर्क एंडपॉइंट सेट करना:",
-    flutterChecklist4Desc: "हमारे एक्सप्रेस बैकएंड को क्लाउड रन पर होस्ट करें, CORS चालू करें, ताकि फ़्लटर ऐप सीधे अनुवाद और सरलीकरण अनुरोध भेज सके।",
-    flutterCopyLibrary: "पूरी लाइब्रेरी कॉपी करें",
-    flutterCopiedLibrary: "डार्ट कोड सफलतापूर्वक कॉपी हो गया!",
 
     interfaceLanguageSelector: "🌎 ऐप की मुख्य भाषा:",
     footerRights: "ग्राहक प्रोजेक्ट स्कोपिंग सहायक • सॉफ़्टवेयर डेवलपर्स के लिए जीवंत वाइब्रेंट पैलेट स्टाइल में निर्मित।"
@@ -1085,7 +898,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     navQuestionnaire: "📝 요구사항 질문 및 브리프",
     navChecklist: "📋 진척 조율 체크리스트",
     navTranslator: "🌎 비전문가용 기술 번역기",
-    navFlutter: "📱 Flutter & Stitch 전환",
     
     promptsBannerTag: "🗣️ 회의 시작 도구",
     promptsBannerTitle: "고객 대화 유도용 질문 카드",
@@ -1154,22 +966,6 @@ export const LOCALIZATION_DICTIONARY: Record<SupportedLanguage, Translations> = 
     transOutputCopyBtn: "이 해설을 복사하기 (고객과의 소통 및 설명에 매우 편리합니다)",
     transOutputCopiedBtn: "해설이 복사되었습니다!",
 
-    flutterBannerTag: "📱 모바일 전환 허브",
-    flutterBannerSub: "Antigravity & Stitch 디자인",
-    flutterBannerTitle: "Flutter & Stitch 모바일 전환 브릿지",
-    flutterBannerDesc: "프로토타입을 모바일 실제 작동을 위해 Antigravity 플랫폼으로 내보내고, Flutter와 Stitch 디자인 표준을 사용하여 완벽한 모바일 네이티브 앱을 구축하는 것은 아주 쉽습니다. 아래에 비즈니스 규칙 및 디자인 시스템 사양에 맞춘 Dart 모델 클래스와 API 통신 라이브러리가 완전히 생성되어 제공됩니다!",
-    flutterSelectModule: "📁 내보낼 소스 코드 모듈 선택:",
-    flutterChecklistTitle: "Stitch & Flutter 구현 체크리스트",
-    flutterChecklist1Title: "Stitch 프레임 및 섀도우 효과:",
-    flutterChecklist1Desc: "모바일 화면에 당사 전용 복고풍 뉴브루탈리즘 스타일의 두꺼운 평면 그림자를 완벽히 재현하기 위해 다트에 구성된 <code>neoBrutalistDecoration</code> 데코레이션 함수를 활용하세요.",
-    flutterChecklist2Title: "로컬 데이터 영속화 처리:",
-    flutterChecklist2Desc: "웹 로컬 스토리지 메모 저장 로직을 Flutter 표준의 <code>shared_preferences</code> 또는 Hive 가벼운 데이터베이스로 매핑하여 진척을 영구적으로 유지시킵니다.",
-    flutterChecklist3Title: "마이크로 비프 사운드 효과:",
-    flutterChecklist3Desc: "Flutter에서 <code>soundpool</code> 패키지를 적용하여 웹 브라우저 standard Web Audio API 신디사이저와 유사한 초저지연 전자 비프 사운드 피드백을 모바일 기기에 구현합니다.",
-    flutterChecklist4Title: "API 통신 요청 엔드포인트 설정:",
-    flutterChecklist4Desc: "Express 백엔드를 Cloud Run 등에 호스팅하고 CORS 통신을 허용해, Flutter 앱 클라이언트에서 다이렉트로 기술 번역 해설 API를 전송할 수 있도록 연결합니다.",
-    flutterCopyLibrary: "전체 코드 라이브러리 복사",
-    flutterCopiedLibrary: "Dart 소스 코드가 복사되었습니다!",
 
     interfaceLanguageSelector: "🌎 앱 전체 사용 언어:",
     footerRights: "고객 요구사항 조율 도구 • 크리에이터를 위한 강렬하고 조화로운 'Vibrant Palette' 플랫 UI 디자인 탑재."

@@ -25,21 +25,12 @@ import {
   Volume2,
   VolumeX,
   ListTodo,
-  Smartphone,
-  Cpu,
-  Palette,
-  Code,
   Mic,
   MicOff,
   Target
 } from "lucide-react";
 
-import { 
-  FLUTTER_THEME_CODE, 
-  FLUTTER_MODELS_CODE, 
-  FLUTTER_DATA_CODE, 
-  FLUTTER_API_CODE 
-} from "./utils/flutter_export";
+
 
 import {
   LOCALIZATION_DICTIONARY,
@@ -295,7 +286,7 @@ const DEFAULT_MILESTONES: Milestone[] = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"prompts" | "questionnaire" | "milestones" | "translator" | "flutter" | "help" | "sandbox">("prompts");
+  const [activeTab, setActiveTab] = useState<"prompts" | "questionnaire" | "milestones" | "translator" | "help" | "sandbox">("prompts");
 
   // Pitch Simulator / Sandbox state
   const [sandboxPersona, setSandboxPersona] = useState("Skeptical & Budget-Focused");
@@ -359,7 +350,6 @@ export default function App() {
 
   // State for Copy actions
   const [copiedText, setCopiedText] = useState<string | null>(null);
-  const [selectedFlutterFile, setSelectedFlutterFile] = useState<"theme" | "models" | "data" | "api">("theme");
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedText(id);
@@ -1499,7 +1489,6 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
               { id: "questionnaire", label: t.navQuestionnaire, color: "hover:bg-[#4ECDC4] hover:text-white" },
               { id: "milestones", label: t.navChecklist, color: "hover:bg-[#A0D2EB]" },
               { id: "translator", label: t.navTranslator, color: "hover:bg-[#FF6B6B] hover:text-white" },
-              { id: "flutter", label: t.navFlutter, color: "hover:bg-[#FFE66D]" },
               { id: "help", label: t.navHelp || "❓ SDLC Founder Help", color: "hover:bg-[#A0D2EB]" },
               { id: "sandbox", label: "💬 Pitch Sandbox", color: "hover:bg-green-400 hover:text-white" }
             ].map((tab) => (
@@ -2589,189 +2578,6 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
           </div>
         )}
 
-        {/* TAB 5: FLUTTER & STITCH DEV TRANSITION */}
-        {activeTab === "flutter" && (() => {
-          let activeCodeText = "";
-          let activeFileName = "";
-          let fileDescription = "";
-          
-          if (selectedFlutterFile === "theme") {
-            activeCodeText = FLUTTER_THEME_CODE;
-            activeFileName = "companion_theme.dart";
-            fileDescription = "Design palette variables mapping heavy retro borders, custom BoxDecorations, and typography parameters based on the Stitch library specification.";
-          } else if (selectedFlutterFile === "models") {
-            activeCodeText = FLUTTER_MODELS_CODE;
-            activeFileName = "companion_models.dart";
-            fileDescription = "Plain Dart models defining checklists, custom milestones, and chat-prompt structures, complete with standard JSON encoders/decoders.";
-          } else if (selectedFlutterFile === "data") {
-            activeCodeText = FLUTTER_DATA_CODE;
-            activeFileName = "companion_data.dart";
-            fileDescription = "Fully populated static datasets representing our exact prompt questions, obj list, and default checklist structures ready for client testing.";
-          } else {
-            activeCodeText = FLUTTER_API_CODE;
-            activeFileName = "companion_api.dart";
-            fileDescription = "Robust HTTP request handler that contacts our Express endpoint with clean client-side translation parsing parameters.";
-          }
-
-          return (
-            <div className="flex flex-col gap-6 animate-fadeIn">
-              {/* Top Banner */}
-              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(45,52,54,1)] border-4 border-[#2D3436]">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="inline-block px-3 py-1 bg-[#FFE66D] text-[#2D2D2D] rounded-full text-xs font-bold border border-black">
-                    {t.flutterBannerTag}
-                  </span>
-                  <span className="inline-block px-3 py-1 bg-[#4ECDC4] text-white rounded-full text-xs font-bold border border-black uppercase tracking-wide">
-                    {t.flutterBannerSub}
-                  </span>
-                </div>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1A1A] mb-3">
-                  {t.flutterBannerTitle}
-                </h2>
-                <p className="text-gray-700 text-sm md:text-base leading-relaxed">
-                  {t.flutterBannerDesc}
-                </p>
-              </div>
-
-              {/* Layout splits */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
-                {/* Left side checklist and navigation */}
-                <div className="lg:col-span-5 flex flex-col gap-5">
-                  
-                  {/* File Selector */}
-                  <div className="bg-white p-5 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)]">
-                    <h3 className="text-xs font-extrabold text-gray-500 uppercase tracking-widest mb-3">{t.flutterSelectModule}</h3>
-                    
-                    <div className="flex flex-col gap-2">
-                      {[
-                        { id: "theme", name: "companion_theme.dart", icon: <Palette className="w-4 h-4 text-teal-500" />, badge: "Stitch Theme" },
-                        { id: "models", name: "companion_models.dart", icon: <Cpu className="w-4 h-4 text-amber-500" />, badge: "Data Models" },
-                        { id: "data", name: "companion_data.dart", icon: <FileText className="w-4 h-4 text-rose-500" />, badge: "Prompts & Presets" },
-                        { id: "api", name: "companion_api.dart", icon: <Code className="w-4 h-4 text-blue-500" />, badge: "Gemini Client" }
-                      ].map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => {
-                            setSelectedFlutterFile(item.id as any);
-                            playBeep(440, "sine", 0.05);
-                          }}
-                          className={`p-3 rounded-xl border-2 text-left font-bold text-xs md:text-sm flex items-center justify-between transition-all ${
-                            selectedFlutterFile === item.id
-                              ? "bg-[#2D3436] text-white border-black shadow-[3px_3px_0px_0px_rgba(78,205,196,1)] translate-y-[-1px]"
-                              : "bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5">
-                            {item.icon}
-                            <span>{item.name}</span>
-                          </div>
-                          <span className={`text-[9px] px-2 py-0.5 rounded-full font-mono font-bold border ${
-                            selectedFlutterFile === item.id ? "bg-white/10 text-teal-300 border-white/20" : "bg-gray-100 text-gray-500 border-gray-200"
-                          }`}>
-                            {item.badge}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Mobile Transition Checklist */}
-                  <div className="bg-white p-5 rounded-3xl border-4 border-[#2D3436] shadow-[4px_4px_0px_0px_rgba(45,52,54,1)]">
-                    <h3 className="text-sm font-extrabold text-[#1A1A1A] border-b-2 border-gray-200 pb-2 mb-3 flex items-center gap-1.5">
-                      <Smartphone className="w-4 h-4 text-[#FF6B6B]" />
-                      <span>{t.flutterChecklistTitle}</span>
-                    </h3>
-
-                    <ul className="flex flex-col gap-3.5 text-xs text-gray-700 font-semibold leading-relaxed">
-                      <li className="flex items-start gap-2">
-                        <div className="w-4 h-4 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-[10px] shrink-0 mt-0.5 font-bold">1</div>
-                        <div>
-                          <strong>{t.flutterChecklist1Title}</strong>
-                          <p className="text-[11px] text-gray-500 font-medium">{t.flutterChecklist1Desc}</p>
-                        </div>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-4 h-4 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-[10px] shrink-0 mt-0.5 font-bold">2</div>
-                        <div>
-                          <strong>{t.flutterChecklist2Title}</strong>
-                          <p className="text-[11px] text-gray-500 font-medium">{t.flutterChecklist2Desc}</p>
-                        </div>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-4 h-4 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-[10px] shrink-0 mt-0.5 font-bold">3</div>
-                        <div>
-                          <strong>{t.flutterChecklist3Title}</strong>
-                          <p className="text-[11px] text-gray-500 font-medium">{t.flutterChecklist3Desc}</p>
-                        </div>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-4 h-4 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-[10px] shrink-0 mt-0.5 font-bold">4</div>
-                        <div>
-                          <strong>{t.flutterChecklist4Title}</strong>
-                          <p className="text-[11px] text-gray-500 font-medium">{t.flutterChecklist4Desc}</p>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-
-                </div>
-
-                {/* Right side Code Previewer */}
-                <div className="lg:col-span-7 flex flex-col gap-4">
-                  <div className="bg-[#2D3436] rounded-3xl border-4 border-black overflow-hidden shadow-[6px_6px_0px_0px_rgba(45,52,54,0.5)] flex flex-col">
-                    
-                    {/* Code editor top-bar */}
-                    <div className="bg-black/40 px-5 py-3.5 border-b-2 border-black flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="flex gap-1.5">
-                          <span className="w-3 h-3 bg-red-400 rounded-full"></span>
-                          <span className="w-3 h-3 bg-yellow-400 rounded-full"></span>
-                          <span className="w-3 h-3 bg-green-400 rounded-full"></span>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-gray-300 ml-2">lib/{activeFileName}</span>
-                      </div>
-                      
-                      {/* Copy code block */}
-                      <button
-                        onClick={() => handleCopy(activeCodeText, `flutter-copy-${selectedFlutterFile}`)}
-                        className="px-3 py-1 bg-teal-500 hover:bg-teal-400 text-black font-extrabold text-[11px] rounded-lg border-2 border-black flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-                      >
-                        {copiedText === `flutter-copy-${selectedFlutterFile}` ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 stroke-[3px]" />
-                            <span>{t.flutterCopiedLibrary}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            <span>{t.flutterCopyLibrary}</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    {/* File explanation banner */}
-                    <div className="bg-[#FFF9F2] text-gray-700 px-5 py-3 border-b-2 border-black text-[11px] font-semibold flex items-center gap-2">
-                      <span className="text-lg">ℹ</span>
-                      <span>{fileDescription}</span>
-                    </div>
-
-                    {/* Code Area */}
-                    <div className="p-4 overflow-x-auto max-h-[500px]">
-                      <pre className="text-[11px] md:text-xs font-mono text-gray-100 leading-relaxed selection:bg-teal-500 selection:text-black">
-                        <code>{activeCodeText}</code>
-                      </pre>
-                    </div>
-
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          );
-        })()}
-
         {/* TAB 6: FOUNDER SDLC HELP DESK */}
         {activeTab === "help" && (
           <div className="flex flex-col gap-6 animate-fadeIn">
@@ -3431,9 +3237,8 @@ Evaluate the provided pitch against the selected persona and output a JSON respo
             <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("questionnaire"); playBeep(523, "sine", 0.05); }}>2. Scoping Board</span>
             <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("milestones"); playBeep(523, "sine", 0.05); }}>3. Checklist</span>
             <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("translator"); playBeep(523, "sine", 0.05); }}>4. Translator</span>
-            <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("flutter"); playBeep(523, "sine", 0.05); }}>5. Flutter Transition</span>
-            <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("help"); playBeep(523, "sine", 0.05); }}>6. Help Desk</span>
-            <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("sandbox"); playBeep(523, "sine", 0.05); }}>7. Pitch Sandbox</span>
+            <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("help"); playBeep(523, "sine", 0.05); }}>5. Help Desk</span>
+            <span className="cursor-pointer hover:underline" onClick={() => { setActiveTab("sandbox"); playBeep(523, "sine", 0.05); }}>6. Pitch Sandbox</span>
           </div>
         </div>
       </footer>
